@@ -15,7 +15,7 @@ import static org.jooq.impl.DSL.*;
 public class Query {
 	public static void main(String[] args) {
 		String userName = "root";
-        String password = "p314159265I!";
+        String password = "changeme";
         String url = "jdbc:mysql://localhost:3306/library";
 
         // Connection is the only JDBC resource that we need

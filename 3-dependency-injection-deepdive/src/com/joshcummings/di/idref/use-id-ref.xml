@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="purchaseService" class="com.joshcummings.di.gumballs.PurchaseService"/>
+
+<bean id="gumballMachineService" class="com.joshcummings.di.gumballs.GumballMachineService">
+    <property name="purchaseService">
+        <idref bean="purchaseService" />
+    </property>
+</bean>
+
+<!-- equivalent, though the first form provides runtime validation whereas the second does not
+
+<bean id="purchaseService" class="com.joshcummings.di.gumballs.PurchaseService"/>
+
+<bean id="client" class="com.joshcummings.di.gumballs.GumballMachineService">
+    <property name="purchaseService" value="purchaseService" />
+</bean>
+ -->
+</beans>

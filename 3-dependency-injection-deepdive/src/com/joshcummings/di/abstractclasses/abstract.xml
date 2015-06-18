@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="abstract" class="com.joshcummings.di.abstractclasses.AbstractExample" abstract="true">
+	    <constructor-arg>
+	        <bean class="com.joshcummings.di.abstractclasses.Dependency"/>
+	    </constructor-arg>
+	</bean>
+	
+	<bean id="otherAbstract" class="com.joshcummings.di.abstractclasses.AbstractExample" abstract="true">
+	    <constructor-arg>
+	        <bean class="com.joshcummings.di.abstractclasses.Dependency"/>
+	    </constructor-arg>
+	</bean>
+	
+	<!--  use the parent attribute to indicate which abstract definition to use -->
+	<bean id="implementation" class="com.joshcummings.di.abstractclasses.SampleImplementation">
+	    <constructor-arg>
+	        <bean class="com.joshcummings.di.abstractclasses.OtherDependency"/>
+	    </constructor-arg>
+	</bean>
+	
+	
+</beans>

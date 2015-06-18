@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!--     <bean id="numberGenerator" class="com.joshcummings.di.instantiation.RandomNumberGenerator">
+        <constructor-arg>
+            <bean class="java.security.SecureRandom"/>
+        </constructor-arg>
+    </bean> -->
+
+     <bean id="numberGenerator" class="com.joshcummings.di.instantiation.ArithmeticNumberGenerator">
+        <constructor-arg name="spacing" value="3"/>
+        <constructor-arg name="secondarySpacing" value="3"/>
+    </bean>
+</beans>

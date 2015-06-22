@@ -1,0 +1,106 @@
+@CHARSET "UTF-8";
+
+* {
+	font-family: sans;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: url('http://www.cultivatingculture.com/wp-content/uploads/2013/02/shutterstock_128677274.jpg');
+	background-size: 2400px;
+}
+
+nav {
+	background: white;
+	font-size: 1.2em;
+	padding: 15px;
+	border: 0px 0px 5px #000;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	background-color: #709070;
+}
+
+nav ul {
+	list-style-type: none;
+}
+
+nav li {
+	display: inline;
+	padding-right: 20px;
+}
+
+nav form {
+	float: right;
+	margin-right: 30px;
+}
+
+.auction h2 {
+	border-bottom: 1px solid;
+	margin: 5px 0px 10px 0px;
+}
+
+.auction input {
+	padding: 5px;
+	font-size: 1.2em;
+	border: 1px solid gray;
+	margin-right: 5px;
+	border-radius: 5px;
+}
+
+.auction {
+	width: 800px;
+	margin: auto;
+	padding: 20px 50px;
+	margin-top: 200px;
+	border-radius: 20px;
+	border: 1px solid black;
+	box-shadow: 1px 1px 1px #888;
+	min-height: 320px;
+	background: white;
+}
+
+.auction img {
+	float: right;
+}
+
+.auction p {
+	padding-bottom: 10px;
+}
+
+.price {
+	font-weight: bold;
+	font-size: 1.4em;
+}
+
+
+.search-results{   
+  border-collapse:collapse;
+  border:1px solid #000000;
+	width: 80%;
+	margin: auto;
+	margin-top: 20px;
+}
+
+.search-results-header{
+   text-align:center;
+   background:none repeat scroll 0 0 #B5B5B5;
+   border-bottom:1px solid #000000;  
+   padding:2px;
+	font-size: 1.2em;
+}
+
+.search-results-even-row {
+   text-align:center;
+   background:#FFFFFFF;
+   height: 50px;
+   font-size: 1.2em;
+}
+
+.search-results-odd-row{
+   text-align:center;
+   background:#ddeeff;
+   height: 50px;
+   font-size: 1.2em;
+}

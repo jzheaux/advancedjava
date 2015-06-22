@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html
+	 xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+<head jsf:id="head">
+<meta charset="UTF-8"></meta>
+<title>Search Results for #{auctionSearchBean.query}</title>
+<link rel="stylesheet" jsf:library="resources"
+	jsf:name="styles/style.css" type="text/css" />
+</head>
+<body jsf:id="body">
+	<nav>
+		<form jsf:id="search">
+			<input name="query" type="text" jsf:value="#{auctionSearchBean.query}" />
+			<input
+				type="submit" jsf:id="searchButton" value="Search"
+				jsf:action="pretty:search-auction"/>
+		</form>
+		<ul>
+			<li>Home</li>
+			<li>My Account</li>
+		</ul>
+	</nav>
+	<div class="auction">
+		<table>
+		<h:dataTable value="#{auctionSearchBean.results}" var="result"
+    			styleClass="search-results"
+    			headerClass="search-results-header"
+    			rowClasses="search-results-odd-row,search-results-even-row">
+	 		<h:column>
+	 			<f:facet name="header">Id</f:facet>
+	 			#{result.id}
+	 		</h:column>
+	 		<h:column>
+	 			<f:facet name="header">Title</f:facet>
+	 			#{result.title}
+	 		</h:column>
+	 		<h:column>
+	 			<f:facet name="header">Price</f:facet>
+	 			#{result.price}
+	 		</h:column>
+	 		<h:column>
+	 			<f:facet name="header">Actions</f:facet>
+	 			<h:outputLink value="#{request.contextPath}/auction/#{result.id}">
+					<h:outputText value="View"/>
+				</h:outputLink>
+	 		</h:column>
+	   </h:dataTable>
+	   </table>
+	</div>
+</body>
+</html>

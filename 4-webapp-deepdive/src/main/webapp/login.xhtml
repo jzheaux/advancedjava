@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html
+	 xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+<head jsf:id="head">
+<meta charset="UTF-8"></meta>
+<title>Search Results for #{auctionSearchBean.query}</title>
+<link rel="stylesheet" jsf:library="resources"
+	jsf:name="styles/style.css" type="text/css" />
+</head>
+<body jsf:id="body">
+	<div class="auction">
+		<form jsf:id="form">
+		    <h:outputLabel for="username">Username:</h:outputLabel>
+    		<input id="username" name="username" type="text" jsf:value="#{loginBean.username}" />
+    		<br/>
+    		<h:outputLabel for="password">Password:</h:outputLabel>
+    		<input id="password" name="password" type="password" jsf:value="#{loginBean.password}" />
+			<input
+				type="submit" jsf:id="loginButton" value="Login"
+				jsf:action="#{loginBean.login}"/>
+		</form>
+	</div>
+</body>
+</html>

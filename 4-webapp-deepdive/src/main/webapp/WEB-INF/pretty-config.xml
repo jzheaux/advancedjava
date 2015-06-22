@@ -1,0 +1,28 @@
+<pretty-config xmlns="http://ocpsoft.org/schema/rewrite-config-prettyfaces" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://ocpsoft.org/schema/rewrite-config-prettyfaces
+                      http://ocpsoft.org/xml/ns/prettyfaces/rewrite-config-prettyfaces.xsd">
+
+	<url-mapping id="view-auction">
+		<pattern value="/auction/#{auctionViewBean.id}" />
+		<view-id value="/auction/show.xhtml" />
+		<action>#{auctionViewBean.show}</action>
+	</url-mapping>
+	<url-mapping id="search-auction">
+		<pattern value="/auction/search/#{auctionSearchBean.query}" />
+		<view-id value="/auction/list.xhtml" />
+		<action>#{auctionSearchBean.doSearch}</action>
+	</url-mapping>
+		<url-mapping id="view-account">
+		<pattern value="/account" />
+		<view-id value="/profile/edit.xhtml" />
+	</url-mapping>
+	<url-mapping id="home">
+		<pattern value="/home" />
+		<view-id value="/home.xhtml" />
+	</url-mapping>
+	<url-mapping id="login">
+		<pattern value="/login" />
+		<view-id value="/login.xhtml" />
+	</url-mapping>
+</pretty-config>

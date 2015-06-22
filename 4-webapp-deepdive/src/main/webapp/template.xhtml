@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
+<head jsf:id="head">
+<meta charset="UTF-8"></meta>
+<title><ui:insert name="title">Auction Site</ui:insert></title>
+<link rel="stylesheet" jsf:library="resources"
+	jsf:name="styles/style.css" type="text/css" />
+</head>
+
+<body jsf:id="body">
+	<nav>
+	<form jsf:id="search">
+		<input name="query" type="text" jsf:value="#{auctionSearchBean.query}" />
+		<input type="submit" jsf:id="searchButton" value="Search"
+			jsf:action="pretty:search-auction" />
+	</form>
+	<ul>
+		<li><h:outputLink value="#{request.contextPath}/home">
+				<h:outputText value="Home" />
+			</h:outputLink></li>
+		<li><h:outputLink value="#{request.contextPath}/profile">
+				<h:outputText value="My Account" />
+			</h:outputLink></li>
+	</ul>
+	</nav>
+	<div class="auction">
+		<ui:insert name="content">Main Content</ui:insert>
+	</div>
+	
+	<!-- Add a footer here that shows the current year -->
+</body>
+</html>

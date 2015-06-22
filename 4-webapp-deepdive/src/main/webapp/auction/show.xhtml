@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:composition template="../template.xhtml">
+            <ui:define name="title">
+            	Auction Item ##{auctionViewBean.id}
+            </ui:define>
+
+            <ui:define name="content">
+<div class="image">
+			<img src="#{auctionViewBean.imageLocation}" />
+		</div>
+		<div>
+			<h2>#{auctionViewBean.title}</h2>
+			<p>#{auctionViewBean.shortDescription}</p>
+			<p class="price">
+				<h:outputText value="#{auctionViewBean.price}">
+    				<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p>
+		</div>
+
+		<form jsf:id="form">
+			<input name="id" type="hidden" jsf:value="#{auctionViewBean.id}" /> <input
+				name="bidPrice" type="text" jsf:value="#{auctionViewBean.bidPrice}" />
+			<input type="submit" jsf:id="submitButton" value="Bid"
+				jsf:actionListener="#{auctionViewBean.placeBid}">
+			<f:ajax execute="@form" render="body" />
+			</input>
+		</form>
+            </ui:define>
+        </ui:composition>
+</html>
+

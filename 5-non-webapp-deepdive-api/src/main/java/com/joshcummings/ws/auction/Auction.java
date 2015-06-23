@@ -1,12 +1,13 @@
-package com.joshcummings.webapp.auction;
+package com.joshcummings.ws.auction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
-import com.joshcummings.webapp.profile.User;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class Auction {
 	private final Long id;
 	private final String title;
@@ -16,6 +17,7 @@ public class Auction {
 	private final String imageLocation;
 	private final Instant startTime;
 	private final Instant endTime;
+	private final Long lastModified;
 	
 	public Auction(Long id, String title, User owner) {
 		this(id, title, owner, new BigDecimal(".01"), title, "");
@@ -32,6 +34,7 @@ public class Auction {
 		this.imageLocation = imageLocation;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.lastModified = System.currentTimeMillis();
 	}
 
 	public Auction(Long id, String title, User owner, BigDecimal price,
@@ -85,5 +88,9 @@ public class Auction {
 
 	public Instant getEndTime() {
 		return endTime;
+	}
+
+	public Long getLastModified() {
+		return lastModified;
 	}
 }

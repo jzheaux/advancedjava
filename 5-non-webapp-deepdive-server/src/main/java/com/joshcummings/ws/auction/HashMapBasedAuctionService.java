@@ -1,4 +1,4 @@
-package com.joshcummings.webapp.auction;
+package com.joshcummings.ws.auction;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
-
-import com.joshcummings.webapp.profile.User;
 
 @Named
 @ApplicationScoped
@@ -46,6 +44,8 @@ public class HashMapBasedAuctionService implements AuctionService {
 		if ( amount.compareTo(a.getPrice()) > 0 ) {
 			a = Auction.withBid(a, amount);
 			auctions.put(a.getId(), a);
+		} else {
+			throw new BidTooLowException("Bid was too low");
 		}
 		return find(a.getId());
 	}

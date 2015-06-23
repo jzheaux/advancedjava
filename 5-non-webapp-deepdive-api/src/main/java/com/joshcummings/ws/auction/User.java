@@ -1,4 +1,4 @@
-package com.joshcummings.webapp.profile;
+package com.joshcummings.ws.auction;
 
 public class User {
 	private final Long id;
@@ -19,6 +19,12 @@ public class User {
 		return username;
 	}
 
+	/** 
+	 * Potential security risk! We could accidentally expose the user's password
+	 * across the wire.
+	 * 
+	 * @return
+	 */
 	public char[] getPassword() {
 		return password;
 	}

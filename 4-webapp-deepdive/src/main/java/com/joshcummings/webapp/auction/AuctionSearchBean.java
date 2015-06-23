@@ -9,6 +9,9 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.joshcummings.ws.auction.Auction;
+import com.joshcummings.ws.auction.AuctionService;
+
 @Named
 @RequestScoped
 public class AuctionSearchBean {

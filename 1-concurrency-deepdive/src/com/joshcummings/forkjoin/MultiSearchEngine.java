@@ -1,7 +1,9 @@
 package com.joshcummings.forkjoin;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Sending a single task out for multi-processing is cumbersome with plain threads.
@@ -13,6 +15,16 @@ import java.util.function.Consumer;
  */
 public class MultiSearchEngine {
 	private String results;
+	
+	public String parallelSearch(String query) {
+		Optional<String> results = Stream.of("Google", "Ask", "Yahoo")
+			.parallel()
+			.map((searchEngineName) ->
+				searchEngineName + " got the results first.")
+			.findAny();
+		
+		return results.get();
+	}
 	
 	public String search(String query) throws InterruptedException {
 		Consumer<String> searchResultsConsumer = new Consumer<String>() {
@@ -33,7 +45,7 @@ public class MultiSearchEngine {
 		Thread google = new Thread(() -> {
 			System.out.println("Searching google...");
 			try {
-				Thread.sleep(waitingPeriod.nextInt(3));
+				Thread.sleep(waitingPeriod.nextInt(3000));
 			} catch (Exception e) {
 				Thread.currentThread().interrupt();
 			}
@@ -43,7 +55,7 @@ public class MultiSearchEngine {
 		Thread ask = new Thread(() -> {
 			System.out.println("Searching ask...");
 			try {
-				Thread.sleep(waitingPeriod.nextInt(3));
+				Thread.sleep(waitingPeriod.nextInt(3000));
 			} catch (Exception e) {
 				Thread.currentThread().interrupt();
 			}
@@ -53,7 +65,7 @@ public class MultiSearchEngine {
 		Thread yahoo = new Thread(() -> {
 			System.out.println("Searching yahoo...");
 			try {
-				Thread.sleep(waitingPeriod.nextInt(3));
+				Thread.sleep(waitingPeriod.nextInt(3000));
 			} catch (Exception e) {
 				Thread.currentThread().interrupt();
 			}
@@ -73,7 +85,16 @@ public class MultiSearchEngine {
 	
 	public static void main(String[] args) throws InterruptedException {
 		MultiSearchEngine mse = new MultiSearchEngine();
-		mse.search("carrot-flavored pidgeons");
-		System.out.println(mse.results);
+		String results = mse.parallelSearch("carrot-flavored pidgeons");
+		System.out.println(results);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

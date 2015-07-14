@@ -26,8 +26,34 @@ public interface AuctionService {
 	@Path("/any")
 	Set<Auction> findAllBySearchQuery(@QueryParam("q") String query);
 	
+	@GET
+	@Path("/by-price")
+	Set<Auction> findAllUnderSpecifiedPrice(
+			@QueryParam("price") Double price);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@POST
 	@Path("/{id}/bid")
 	@Consumes("application/json")
 	Auction placeBid(@PathParam("id") Long id, BigDecimal amount);
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

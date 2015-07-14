@@ -33,12 +33,8 @@ public class StandardNioServer {
 				@Override
 				public void completed(AsynchronousSocketChannel connection,
 						Object attachment) {
-					try {
-						Thread.sleep(100);
-					} catch ( InterruptedException e ) {
-						
-					}
 					listener.accept(null, this);
+
 					CompletableFuture.supplyAsync(() -> { 
                         try {
                             ByteBuffer buffer = ByteBuffer.allocateDirect(1024);

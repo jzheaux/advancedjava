@@ -39,8 +39,8 @@ public class OrderService {
 		Order redo = new Order(o.getOrderer(), o.getShipping());
 		o.getItems().stream()
 				.forEach((oi) -> redo.addItem(oi.getItem(), oi.getQty()));
-		em.persist(o);
-		return o;
+		em.persist(redo);
+		return redo;
 	}
 	
 	public Order retreive(Long id) {
@@ -48,6 +48,8 @@ public class OrderService {
 	}
 	
 	/**
+	 * @deprecated - Please use {@link Order#getOrderTotal()}
+	 * 
 	 * Where should this method go?
 	 * 
 	 * It does seem nice here, but it gives us a higher LCOM value, which may be an indication that
@@ -57,13 +59,13 @@ public class OrderService {
 	 * @return
 	 */
 	public BigDecimal getOrderTotal(Long id) {
-		BigDecimal total = BigDecimal.ZERO;
 		Order o = retreive(id);
-		for ( OrderItem oi : o.getItems() ) {
-			BigDecimal bQty = new BigDecimal(oi.getQty());
-			total = total.add(
-					oi.getItem().getPrice().multiply(bQty));
-		}
-		return total.add(o.getShipping());
+		return o.getOrderTotal();
 	}
+	
+	
+	
+	
+	
+	
 }

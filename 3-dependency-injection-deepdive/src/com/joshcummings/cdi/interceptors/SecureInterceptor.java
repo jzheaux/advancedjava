@@ -33,4 +33,20 @@ public class SecureInterceptor implements Serializable {
         	throw new IllegalArgumentException("User not authorized to perform operation.");
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

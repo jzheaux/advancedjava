@@ -47,7 +47,10 @@ public class Order {
 	@Column(name="UPDATED_DATE")
 	private Instant updatedDate = Instant.now();
 	
-	@OneToMany(fetch=FetchType.EAGER, cascade={CascadeType.ALL}, orphanRemoval=true, mappedBy="order")
+	@OneToMany(fetch=FetchType.EAGER,
+			cascade={CascadeType.ALL},
+			orphanRemoval=true,
+			mappedBy="order")
 	private Set<OrderItem> items = new HashSet<OrderItem>();
 	
 	public Order() {}
@@ -117,4 +120,29 @@ public class Order {
 	public Set<OrderItem> getItems() {
 		return Collections.unmodifiableSet(items);
 	}
+	
+	public BigDecimal getOrderTotal() {
+		// calculate the order total
+		BigDecimal total = BigDecimal.ZERO;
+		for ( OrderItem oi : items ) {
+			BigDecimal bQty = new BigDecimal(oi.getQty());
+			total = total.add(
+					oi.getItem().getPrice().multiply(bQty));
+		}
+		return total.add(this.getShipping());
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

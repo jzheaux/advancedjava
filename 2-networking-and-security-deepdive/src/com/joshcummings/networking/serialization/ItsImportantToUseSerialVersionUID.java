@@ -11,8 +11,11 @@ import java.util.Arrays;
 
 public class ItsImportantToUseSerialVersionUID {
 	private static class UserAccount implements Serializable {
+		private static final long serialVersionUID = 1L;
+		
 		private final String username;
 		private final char[] password;
+		private final String name = "asdf";
 		
 		public UserAccount(String username, char[] password) {
 			this.username = username;

@@ -21,22 +21,49 @@ public class AtomicDoesntHelpCompoundActions {
 		for ( int i = 0; i < 10000; i++ ) {
 			CountDownLatch cdl = new CountDownLatch(10);
 			for ( int j = 0; j < 10; j++ ) {
-				String value = "value" + i;
+				String value = "value" + j;
 				es.submit(() -> {
-					Vector<String> concurrent = concurrentHashMap.get("values");
-					if ( concurrent == null ) {
-						concurrent = new Vector<>();
-						concurrentHashMap.put("values", concurrent);
+					Vector<String> concurrent;
+					synchronized ( concurrentHashMap ) {
+						concurrent = concurrentHashMap.get("values");
+						if ( concurrent == null ) {
+							concurrent = new Vector<>();
+							concurrentHashMap.put("values", concurrent);
+						}
 					}
 					concurrent.add(value);
+					
 					cdl.countDown();
 				});
 			}
 			cdl.await();
 			if ( concurrentHashMap.get("values").size() != 10 ) {
 				System.out.println("Data loss: " + concurrentHashMap.get("values").size());
+			} else {
+				System.out.println(concurrentHashMap.get("values"));
 			}
 			concurrentHashMap.remove("values");
 		}
+		System.out.println("Done!");
+		es.shutdown();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 }

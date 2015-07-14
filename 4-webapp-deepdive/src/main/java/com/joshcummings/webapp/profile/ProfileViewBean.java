@@ -19,6 +19,9 @@ public class ProfileViewBean {
 		username = p.getName();
 	}
 
+	@IsLoggedIn(
+			orThrow=IllegalArgumentException.class
+	)
 	public void show() {
 		// 2. Add here a lookup to profile service by username
 	}

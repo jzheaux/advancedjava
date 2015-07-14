@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
@@ -52,5 +53,11 @@ public class CanWeDoBetterWithCompletableFuture {
 
 	public static void main(String[] args) throws Exception {
 		asyncServerLoop(8080);
+		try ( Socket s = new Socket("localhost", 8080) ) {
+			PrintWriter pw = new PrintWriter(s.getOutputStream(), true);
+			BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			pw.println("Hello");
+			System.out.println(br.readLine());
+		}
 	}
 }

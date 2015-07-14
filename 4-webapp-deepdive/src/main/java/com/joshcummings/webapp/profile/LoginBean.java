@@ -29,7 +29,18 @@ public class LoginBean {
   public void setPassword(char[] password) {
     this.password = password;
   }
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   public String login () {
     FacesContext context = FacesContext.getCurrentInstance();
     HttpServletRequest request = (HttpServletRequest) 

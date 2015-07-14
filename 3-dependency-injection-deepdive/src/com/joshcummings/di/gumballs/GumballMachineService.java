@@ -3,10 +3,19 @@ package com.joshcummings.di.gumballs;
 import java.util.List;
 
 public class GumballMachineService {
-	private GumballMachineDao machineDao = new GumballMachineDao();
-	private MachineKeyDao keyDao = new MachineKeyDao();
-	
-	private PurchaseService purchaseService = new PurchaseService();
+	private /*final*/ GumballMachineDao machineDao;
+	private /*final*/ MachineKeyDao keyDao;
+	private /*final*/ PurchaseService purchaseService;
+
+/*
+ 	public GumballMachineService(GumballMachineDao machineDao,
+			MachineKeyDao keyDao, PurchaseService purchaseService) {
+		this.machineDao = machineDao;
+		this.keyDao = keyDao;
+		this.purchaseService = purchaseService;
+	}
+//*/
+
 	
 	public Gumball purchaseGumball(Long gumballMachineId, Double money, Long userId) {
 		GumballMachine gm = lookupMachine(gumballMachineId);
@@ -19,6 +28,18 @@ public class GumballMachineService {
 		throw new IllegalArgumentException("Exact change only, please."); 
 	}
 	
+	public void setMachineDao(GumballMachineDao machineDao) {
+		this.machineDao = machineDao;
+	}
+
+	public void setKeyDao(MachineKeyDao keyDao) {
+		this.keyDao = keyDao;
+	}
+
+	public void setPurchaseService(PurchaseService purchaseService) {
+		this.purchaseService = purchaseService;
+	}
+
 	public Double extractCoins(Long gumballMachineId, Long machineKeyId) {
 		GumballMachine gm = machineDao.find(gumballMachineId);
 		MachineKey mk = keyDao.find(machineKeyId);

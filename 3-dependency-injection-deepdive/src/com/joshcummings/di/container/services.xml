@@ -6,13 +6,34 @@
 
     <!-- services -->
 
-    <bean id="gumballMachineService" class="com.joshcummings.di.gumballs.GumballMachineService">
-        <property name="gumballMachineDao" ref="gumballMachineDao"/>
-        <property name="machineKeyDao" ref="machineKeyDao"/>
-        <property name="purchaseService" ref="purchaseService"/>
+    <bean id="gumballMachineService" 
+    	class="com.joshcummings.di.gumballs.GumballMachineService">
+        <property name="machineDao" 
+        	ref="gumballMachineDao"/>
+        <property name="keyDao" 
+        	ref="machineKeyDao"/>
+        <property name="purchaseService" 
+        	ref="purchaseService"/>
         <!-- additional collaborators and configuration for this bean go here -->
     </bean>
 
     <!-- Add the bean definition for the purchase service -->
-	
+	<bean id="purchaseService"
+		class="com.joshcummings.di.gumballs.PurchaseService"/>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 </beans>

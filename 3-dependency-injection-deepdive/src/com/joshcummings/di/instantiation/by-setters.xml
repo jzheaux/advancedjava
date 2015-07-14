@@ -4,7 +4,8 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean id="numberGenerator" class="com.joshcummings.di.instantiation.RandomNumberGenerator"/>
+    <bean id="numberGenerator"
+    	class="com.joshcummings.di.instantiation.RandomNumberGenerator"/>
 
     <!--  add a setter to random number generator and supply it above -->
 </beans>

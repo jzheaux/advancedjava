@@ -31,7 +31,23 @@ public class BorrowingService {
 	}
 	
 	@JmsListener(destination = "com.joshcumings.jms.borrower.response")
-    public void moneyLent(BigDecimal amount, Session session) {
-		System.out.println("Received money: " + amount);
-	}
+    public void moneyLent(LendingResponse response, Session session) {
+		if ( response.wasLoanSuccessful() ) {
+			System.out.println("Received money: " + response.getAmount());
+		} else {
+			System.out.println("Did NOT receive money: " + response.getMessage());
+		}
+	}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

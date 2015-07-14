@@ -68,7 +68,14 @@ public class OrderServiceIT {
 	
 	@Test
 	public void testReorder() {
-		// add this test
+		// get an order so that we can re-order it.
+		Order o = os.placeOrder(orderer, cart);
+		Order reordered = os.reorder(o.getId());
+		
+		// what should we assert?
+		// Make sure that the ids are different
+		Assert.assertNotEquals(o.getId(), reordered.getId());
+		Assert.assertEquals(o.getItems().size(), reordered.getItems().size());
 	}
 	
 	@Test
@@ -78,4 +85,23 @@ public class OrderServiceIT {
 		BigDecimal total = os.getOrderTotal(o.getId());
 		Assert.assertEquals(new BigDecimal("152.06"), total.setScale(2, BigDecimal.ROUND_HALF_UP));
 	}
+	
+	@Test
+	public void testOrderTotalFromBean() {
+		Order o = os.placeOrder(orderer, cart);
+		
+		BigDecimal total = o.getOrderTotal();
+		Assert.assertEquals(new BigDecimal("152.06"), total.setScale(2, BigDecimal.ROUND_HALF_UP));
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

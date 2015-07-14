@@ -32,6 +32,15 @@ public class AuctionSearchBean {
 		return new ArrayList<>(results);
 	}
 	
+	public boolean isResultsEmpty() {
+		return results.isEmpty();
+	}
+	
+	
+	
+	
+	
+	
 	public void doSearch() {
 		results = auctionService.findAllBySearchQuery(query);
 	}

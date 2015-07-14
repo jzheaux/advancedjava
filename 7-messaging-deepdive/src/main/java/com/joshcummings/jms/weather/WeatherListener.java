@@ -12,7 +12,7 @@ public class WeatherListener {
 	 */
 	
 	@JmsListener(destination="weather-topic", containerFactory="myJmsContainerFactory",
-			selector="weatherTower = 'Nashville'" /*, concurrency="5-10"*/
+			selector="weatherTower = 'Nashville'", concurrency="5-10"
 			/*, subscription="durable"*/
 			)
 	public void weatherReceived(Double weather) {

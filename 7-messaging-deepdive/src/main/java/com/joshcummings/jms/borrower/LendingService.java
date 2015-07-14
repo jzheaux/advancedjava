@@ -13,14 +13,15 @@ import org.springframework.stereotype.Service;
 public class LendingService {
 
 	private final JmsTemplate jmsTemplate;
-	private volatile BigDecimal money = new BigDecimal("1231223123.34");
+	private volatile BigDecimal money = new BigDecimal("12356.34");
 	
 	@Inject
 	public LendingService(JmsTemplate jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
 	}
 	
-    @JmsListener(destination = "com.joshcummings.jms.borrower.request")
+    @JmsListener(destination = "com.joshcummings.jms.borrower.request",
+    		concurrency="6")
     public void moneyRequested(BigDecimal amount) {
     	BigDecimal toLend = amount;
     	synchronized ( money ) {
@@ -30,10 +31,34 @@ public class LendingService {
     			money = BigDecimal.ZERO;
     		}
     	}
+    	
     	final BigDecimal lent = toLend;
-        jmsTemplate.send("com.joshcumings.jms.borrower.response", 
+    	String message = "Yay!";
+    	if ( lent.compareTo(BigDecimal.ZERO) <= 0 ) {
+	        message = "Insufficient Funds for your"
+					+ " request for $" + amount;
+    	}
+    	LendingResponse response = new LendingResponse(message, lent);
+		jmsTemplate.send("com.joshcumings.jms.borrower.response", 
         		(session) ->
-        			session.createObjectMessage(lent));
+        			session.createObjectMessage(response));
+    	
     }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

@@ -4,11 +4,37 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="numberGeneratorFactory" class="com.joshcummings.di.instantiation.NumberGeneratorFactory"/>
+    <bean id="numberGeneratorFactory"
+    	class="com.joshcummings.di.instantiation.NumberGeneratorFactory"/>
     
-    <bean id="numberGenerator" factory-bean="numberGeneratorFactory" factory-method="secureRandomGenerator"/>
+    <bean id="numberGenerator"
+    	factory-bean="numberGeneratorFactory"
+    	factory-method="secureRandomGenerator"/>
 
     <!-- 1.  use the instance factory to instantiate the other kinds of generators -->
+	<bean id="basicNumberGenerator"
+    	factory-bean="numberGeneratorFactory"
+    	factory-method="randomGenerator"/>    
     
+    <bean id="primeGenerator"
+    	factory-bean="numberGeneratorFactory"
+    	factory-method="primeGenerator"/>
+    
+    <alias name="basicNumberGenerator" alias="defaultNumberGenerator"/>
     <!-- 2.  use the alias attribute to indicate the default implementation to use -->
 </beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

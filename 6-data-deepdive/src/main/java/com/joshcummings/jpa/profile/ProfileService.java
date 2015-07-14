@@ -28,8 +28,9 @@ public class ProfileService {
 		this.em = em;
 	}
 	
-	public Profile create(String firstName, String lastName, String emailAddress) {
-		Profile p = new Profile(firstName, lastName, emailAddress);
+	public Profile create(String firstName, String lastName, String emailAddress,
+			String phone) {
+		Profile p = new Profile(firstName, lastName, emailAddress, phone);
 		
 		/**
 		 * We leave the id out of the constructor and out of the code here; we let EntityManager
@@ -38,6 +39,10 @@ public class ProfileService {
 		 */
 		em.persist(p);
 		return p;
+	}
+	
+	public Profile create(String firstName, String lastName, String emailAddress) {
+		return create(firstName, lastName, emailAddress, null);
 	}
 	
 	public Profile retreive(Long id) {
@@ -92,4 +97,22 @@ public class ProfileService {
 		Profile p = retreive(id);
 		em.remove(p);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

@@ -22,7 +22,7 @@ public class WhyDateIsBad {
 	}
 
 	public Date getBirthDate() {
-		return birthDate;
+		return new Date(birthDate.getTime());
 	}
 
 	@Override
@@ -42,4 +42,18 @@ public class WhyDateIsBad {
 		birthDate.setTime(System.currentTimeMillis());
 		System.out.println(wdib); // dang, broken encapsulation!
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

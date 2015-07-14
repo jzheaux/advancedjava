@@ -49,7 +49,7 @@ public class ProfileServiceIT {
 	@Test
 	public void testUpdateName() {
 		Profile created = ps.create("Jack", "Bower", "jack.bower@24.net");
-		
+
 		Profile changedName = ps.changeName(created.getId(), "Jill", "Bower");
 		
 		Assert.assertEquals(created.getEmail(), changedName.getEmail());
@@ -78,4 +78,36 @@ public class ProfileServiceIT {
 		
 		Assert.assertNull(notThere);
 	}
+	
+	@Test
+	public void testQueryExistingObjectWithPhone() {
+		Profile created = ps.create("Dave", "Thomas", "dave.thomas@wendys.com",
+				"800-555-1212");
+		
+		String phone = created.getPhone();
+		
+		created = ps.retreive(created.getId());
+		
+		Assert.assertNotNull(created);
+		Assert.assertEquals(phone, created.getPhone());
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

@@ -66,7 +66,7 @@ public class CourseServiceIT {
 		int numStudents = c.getStudents().size();
 		
 		ReadOnlyCourse withStudent = cs.enrollStudentInCourse(c.getId(), s.getId());
-		
+
 		Assert.assertNotNull(withStudent);
 		Assert.assertEquals(numStudents + 1, withStudent.getStudents().size());
 		

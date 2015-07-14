@@ -37,6 +37,8 @@ public class Student implements ReadOnlyStudent {
 	@ManyToMany(mappedBy="students")
 	private Set<Course> courses = new HashSet<>();
 	
+	protected Student() {}
+	
 	public Student(Profile profile, Double gpa) {
 		this.profile = profile;
 		this.gpa = gpa;

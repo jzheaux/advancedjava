@@ -6,14 +6,16 @@ import java.util.concurrent.Future;
 
 
 public class LostUpdate {
-	private int count;
+	private volatile int count;
 	
 	public void increment() {
-		for ( int i = 0; i < 1000000; i++ ) {
-			count++;
+		synchronized ( this ) {
+			for ( int i = 0; i < 1000000; i++ ) {
+				count++;
+			}
 		}
 	}
-	
+
 	public void finished() {
 		System.out.printf("The final count is: %d%n", count);
 	}
@@ -35,5 +37,22 @@ public class LostUpdate {
 		Future<?> f2 = es.submit(lu::increment);
 		f1.get(); f2.get();
 		lu.finished();
+		es.shutdown();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 }

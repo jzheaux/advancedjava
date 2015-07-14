@@ -24,6 +24,9 @@ public class Profile {
 	@Column
 	private String email;
 	
+	@Column(name="PHONE_NUMBER")
+	private String phone;
+	
 	public Profile() {
 		// hibernate needs this
 	}
@@ -38,9 +41,22 @@ public class Profile {
 	 * @param email
 	 */
 	public Profile(String firstName, String lastName, String email) {
+		this(firstName, lastName, email, null);
+	}
+
+	/**
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @param phone
+	 */
+	public Profile(String firstName, String lastName, String email,
+			String phone) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
+		this.phone = phone;
 	}
 
 	public Long getId() {
@@ -71,10 +87,19 @@ public class Profile {
 		this.email = email;
 	}
 
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		// what to do here?
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result
 				+ ((firstName == null) ? 0 : firstName.hashCode());
@@ -99,6 +124,7 @@ public class Profile {
 			return false;
 		Profile other = (Profile) obj;
 		
+		// what about here?
 		if (email == null) {
 			if (other.email != null)
 				return false;

@@ -42,7 +42,25 @@ public class SecuringSerialization {
 		Key key = kg.generateKey();
 		Cipher cipher = Cipher.getInstance(algorithm);
 		cipher.init(Cipher.ENCRYPT_MODE, key);
-		return new SealedObject(secret, cipher);
+		return new SealedObject(s, cipher);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 	
 	public static void main(String[] args) throws Exception {

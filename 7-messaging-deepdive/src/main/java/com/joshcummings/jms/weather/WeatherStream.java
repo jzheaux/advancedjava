@@ -29,7 +29,8 @@ public class WeatherStream {
 	 */
 	public void begin() {
 		Random r = new Random();
-		Stream.iterate(new Double(83.2421), (previous) -> new Double(previous + r.nextDouble() - 0.5))
+		Stream.iterate(new Double(83.2421), 
+				(previous) -> new Double(previous + r.nextDouble() - 0.5))
 			.forEach((temperature) -> {
 				jmsTemplate.send(weatherTopic, (session) -> {
 					Message m = session.createObjectMessage(temperature);

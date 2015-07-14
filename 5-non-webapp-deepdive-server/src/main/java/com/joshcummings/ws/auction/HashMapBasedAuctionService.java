@@ -30,11 +30,25 @@ public class HashMapBasedAuctionService implements AuctionService {
 	}
 
 	@Override
+	public Set<Auction> findAllUnderSpecifiedPrice(Double price) {
+		BigDecimal bdPrice = new BigDecimal(price);
+		
+		return auctions
+				.values().stream()
+				.filter((auction) -> {
+					return 
+						auction.getPrice()
+							.compareTo(bdPrice) < 0;
+				}).collect(Collectors.toSet());
+	}
+	
+	@Override
 	public Set<Auction> findAllBySearchQuery(String query) {
 		return auctions
 					.values().stream()
 					.filter((auction) -> {
-						return auction.getShortDescription().contains(query);
+						return auction.getShortDescription()
+								.contains(query);
 					}).collect(Collectors.toSet());
 	}
 
@@ -50,4 +64,17 @@ public class HashMapBasedAuctionService implements AuctionService {
 		return find(a.getId());
 	}
 
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

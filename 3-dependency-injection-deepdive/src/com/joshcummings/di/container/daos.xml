@@ -9,4 +9,6 @@
         <!-- additional collaborators and configuration for this bean go here -->
     </bean>
 
+	<bean id="machineKeyDao"
+		class="com.joshcummings.di.gumballs.MachineKeyDao"/>
 </beans>

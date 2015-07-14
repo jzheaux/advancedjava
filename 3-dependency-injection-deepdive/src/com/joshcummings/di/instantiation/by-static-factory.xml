@@ -4,7 +4,8 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean id="numberGenerator" class="com.joshcummings.di.instantiation.PrimeNumberGenerator" factory-method="withPrimes">
+    <bean id="numberGenerator"
+    	class="com.joshcummings.di.instantiation.PrimeNumberGenerator" factory-method="withPrimes">
         <constructor-arg>
             <list>
                 <value>7</value>

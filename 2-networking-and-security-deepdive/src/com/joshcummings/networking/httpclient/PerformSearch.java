@@ -12,9 +12,36 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 public class PerformSearch {
-	private HttpClient client = HttpClientBuilder.create().build();
+	private static HttpClient client = HttpClientBuilder.create().build();
 	
-	private String searchIndividual(String query) {
+	public static void main(String[] args) throws ClientProtocolException, IOException {
+		String results =
+				Stream.of("http://www.google.com?q=Java",
+						  "http://www.ask.com/web?q=Java",
+						  "http://www.yahoo.com/search?p=Java")
+					.parallel()
+					.map(
+						(query) -> {
+							return searchIndividual(query);
+						})
+					.map(
+						(html) -> {
+							if ( html.startsWith("<!doctype") ) {
+								return "well-formed!";
+							} else {
+								return "mal-formed!";
+							}
+						}
+					)
+					.map(
+						(report) -> report.toString() + "!"
+					)
+					.findAny().get();
+		
+		System.out.println(results);
+	}
+	
+	private static String searchIndividual(String query) {
 		try {
 			HttpGet get = new HttpGet(query);
 			HttpResponse response = client.execute(get);
@@ -37,8 +64,5 @@ public class PerformSearch {
 		// implement this - make it real!
 		return null;
 	}
-	
-	public static void main(String[] args) throws ClientProtocolException, IOException {
 
-	}
 }

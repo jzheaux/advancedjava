@@ -1,6 +1,6 @@
 package com.joshcummings.badvisibility;
 public class LoopMayNeverEnd { 
-  boolean done = false; 
+  volatile boolean done = false; 
 
   /**
    * Because this is operating in a different thread, it may not see the change to the

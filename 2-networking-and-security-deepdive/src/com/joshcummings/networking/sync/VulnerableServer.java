@@ -6,15 +6,19 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class VulnerableServer {
 	
 	public static void handleConnection(Socket s) {
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			String input = br.readLine();
 			PrintWriter pw = new PrintWriter(s.getOutputStream(), true);
-			pw.println(input);
+			while ( !Thread.currentThread().isInterrupted() ) {
+				String input = br.readLine();
+				pw.println("Hello, " + input);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -26,15 +30,31 @@ public class VulnerableServer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-			try (ServerSocket ss = new ServerSocket(8080);) {
-				while (true) {
-					Socket s = ss.accept();
-					new Thread(() ->
-						VulnerableServer.handleConnection(s)
-					).start();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+		// use executor Service instead 
+		// of instantiating a new thread each time
+		ExecutorService es = Executors.newFixedThreadPool(1000);
+		try (ServerSocket ss = new ServerSocket(8080);) {
+			System.out.println("Server is running...");
+			while (true) {
+				Socket s = ss.accept();
+				es.submit(() ->
+					VulnerableServer.handleConnection(s)
+				);
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

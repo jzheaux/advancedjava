@@ -1,4 +1,4 @@
-package com.joshcummings.codeplay.concurrency;
+package com.joshcummings.codeplay.concurrency.old;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,6 +17,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+
+import com.joshcummings.codeplay.concurrency.AddressVerifier;
+import com.joshcummings.codeplay.concurrency.BadIdentity;
+import com.joshcummings.codeplay.concurrency.EmailFormatter;
+import com.joshcummings.codeplay.concurrency.Identity;
+import com.joshcummings.codeplay.concurrency.IdentityReader;
+import com.joshcummings.codeplay.concurrency.IdentityService;
+import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
+import com.joshcummings.codeplay.concurrency.Person;
+import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
+import com.joshcummings.codeplay.concurrency.StatsCounter;
 
 public class IdentityPipeline {
 	private MalformedBatchRepository malformed; // fire and forget
@@ -122,15 +134,10 @@ public class IdentityPipeline {
 							attemptMerge(identity);
 							
 							// shared resource for which all threads will contend
-							statsCounter.lock();
-							try {
-								statsCounter.countFirstName(identity);
-								statsCounter.countLastName(identity);
-								statsCounter.countAge(identity);
-								statsCounter.countRecord(identity);
-							} finally {
-								statsCounter.unlock();
-							}
+							statsCounter.countFirstName(identity);
+							statsCounter.countLastName(identity);
+							statsCounter.countAge(identity);
+							statsCounter.countRecord(identity);
 						} else {
 							malformed.addIdentity(identity, "Couldn't verify all parts of identity.");
 						}
@@ -159,23 +166,6 @@ public class IdentityPipeline {
 		
 		if ( identity.getAddresses().stream().allMatch(a -> !a.isVerified())) {
 			throw new NoValidAddressesException();
-		}
-	}
-	
-	private static class MergeCandidate implements Comparable<MergeCandidate> {
-		private final Identity candidate;
-		private final Integer score;
-		
-		public MergeCandidate(Identity candidate, Integer score) {
-			this.candidate = candidate;
-			this.score = score;
-		}
-		public Identity getCandidate() {
-			return candidate;
-		}
-		@Override
-		public int compareTo(MergeCandidate that) {
-			return this.score.compareTo(that.score);
 		}
 	}
 	
@@ -226,6 +216,7 @@ public class IdentityPipeline {
 		}
 		
 		return false;
+		
 	}
 	
 	// try all and proceed with whichever returned first

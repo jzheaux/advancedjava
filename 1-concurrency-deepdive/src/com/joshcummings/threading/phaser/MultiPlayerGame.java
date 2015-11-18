@@ -80,7 +80,7 @@ public final class MultiPlayerGame {
 		MultiPlayerGame mpg = new MultiPlayerGame();
 		
 		ExecutorService es = Executors.newCachedThreadPool();
-		for ( int i = 0; i < 100; i++ ) {
+		for ( int i = 0; i < 101; i++ ) {
 			final String name = "player" + i;
 			es.submit(() -> {
 				Player p = new Player(name);

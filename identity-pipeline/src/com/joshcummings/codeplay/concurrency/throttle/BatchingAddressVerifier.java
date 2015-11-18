@@ -1,4 +1,4 @@
-package com.joshcummings.codeplay.concurrency;
+package com.joshcummings.codeplay.concurrency.throttle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
+import com.joshcummings.codeplay.concurrency.Address;
+import com.joshcummings.codeplay.concurrency.AddressVerifier;
 
 public class BatchingAddressVerifier implements AddressVerifier {
 	private Queue<Address> toBeVerified = new ConcurrentLinkedQueue<>();

@@ -1,13 +1,12 @@
 package com.joshcummings.codeplay.concurrency;
 
+import java.io.OutputStream;
+
 public interface StatsCounter {
-	void lock();
-	void unlock();
-	
 	void countRecord(Identity identity);
 	void countFirstName(Identity identity);
 	void countLastName(Identity identity);
 	void countAge(Identity identity);
 	
-	Integer getRecordCount();
+	void writeStats(OutputStream os);
 }

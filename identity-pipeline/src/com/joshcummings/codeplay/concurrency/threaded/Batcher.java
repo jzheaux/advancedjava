@@ -1,4 +1,4 @@
-package com.joshcummings.codeplay.concurrency;
+package com.joshcummings.codeplay.concurrency.threaded;
 
 import java.util.ArrayList;
 import java.util.List;

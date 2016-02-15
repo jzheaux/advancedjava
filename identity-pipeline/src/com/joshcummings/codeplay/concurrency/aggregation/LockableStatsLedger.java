@@ -12,8 +12,7 @@ import com.joshcummings.codeplay.concurrency.StatsLedger;
 public class LockableStatsLedger implements StatsLedger {
 	private StatsLedger delegate;
 	private ReentrantLock lock = new ReentrantLock();
-	
-	// scheduled?
+
 	private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	
 	public LockableStatsLedger(StatsLedger delegate) {

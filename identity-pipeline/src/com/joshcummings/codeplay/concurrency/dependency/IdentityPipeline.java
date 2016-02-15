@@ -11,7 +11,7 @@ import com.joshcummings.codeplay.concurrency.EmailFormatter;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
 import com.joshcummings.codeplay.concurrency.IdentityService;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
 import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
@@ -21,7 +21,7 @@ import com.joshcummings.codeplay.concurrency.splitting.AsyncMultiStrategyIdentit
 
 
 public class IdentityPipeline {
-	private MalformedBatchRepository malformed; // fire and forget
+	private MalformedIdentityRepository malformed; // fire and forget
 	private IdentityReader identityReader; 
 	private AddressVerifier addressVerifier;
 	private PhoneNumberFormatter phoneNumberFormatter;
@@ -31,7 +31,7 @@ public class IdentityPipeline {
 	
 	private ExecutorService es = Executors.newCachedThreadPool();
 	
-	public IdentityPipeline(MalformedBatchRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
+	public IdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
 			PhoneNumberFormatter phoneNumberFormatter, EmailFormatter emailFormatter, IdentityService identityService, StatsLedger statsLedger) {
 		this.malformed = malformed;
 		this.identityReader = identityReader;

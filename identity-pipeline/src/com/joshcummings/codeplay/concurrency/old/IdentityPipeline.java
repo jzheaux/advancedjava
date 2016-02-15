@@ -24,14 +24,15 @@ import com.joshcummings.codeplay.concurrency.EmailFormatter;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
 import com.joshcummings.codeplay.concurrency.IdentityService;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.IdentityService.MergeCandidate;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
 import com.joshcummings.codeplay.concurrency.Person;
 import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsCounter;
 
 public class IdentityPipeline {
-	private MalformedBatchRepository malformed; // fire and forget
+	private MalformedIdentityRepository malformed; // fire and forget
 	private List<IdentityReader> identityReaders; 
 	private AddressVerifier addressVerifier;
 	private PhoneNumberFormatter phoneNumberFormatter;
@@ -56,7 +57,7 @@ public class IdentityPipeline {
 	
 	private CyclicBarrier cb = new CyclicBarrier(1500, this::displayStats);
 	
-	public IdentityPipeline(MalformedBatchRepository malformed, List<IdentityReader> identityReaders, AddressVerifier addressVerifier,
+	public IdentityPipeline(MalformedIdentityRepository malformed, List<IdentityReader> identityReaders, AddressVerifier addressVerifier,
 			PhoneNumberFormatter phoneNumberFormatter, EmailFormatter emailFormatter, IdentityService identityService, StatsCounter statsCounter) {
 		this.malformed = malformed;
 		this.identityReaders = identityReaders;
@@ -68,7 +69,7 @@ public class IdentityPipeline {
 	}
 	
 	public void displayStats() {
-		System.out.println("Number of records: " + statsCounter.getRecordCount());
+		System.out.println("Number of records: " + 0);//statsCounter.getRecordCount());
 	}
 	
 	public List<Identity> query(Predicate<Identity> pred) {

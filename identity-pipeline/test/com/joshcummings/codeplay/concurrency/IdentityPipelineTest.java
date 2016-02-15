@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import com.joshcummings.codeplay.concurrency.aggregation.LockableStatsLedger;
 import com.joshcummings.codeplay.concurrency.aggregation.ThreadedIdentityService;
-import com.joshcummings.codeplay.concurrency.fireandforget.ForkJoinPoolMalformedBatchRepository;
-import com.joshcummings.codeplay.concurrency.fireandforget.ProducerConsumerMalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.fireandforget.ProducerMalformedIdentityRepository;
+import com.joshcummings.codeplay.concurrency.fireandforget.ThreadPoolExecutorMalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.single.IdentityPipeline;
 import com.joshcummings.codeplay.concurrency.single.MultiStrategyIdentityReader;
 import com.joshcummings.codeplay.concurrency.single.SimpleStatsLedger;
@@ -38,25 +38,11 @@ public class IdentityPipelineTest {
 		}
 	}
 	
-	private final List<Identity> identities = new ArrayList<>();
-	
-	{ 
-		for ( int i = 0; i < 1000; i++ ) {
-			identities.add(new Person("bobs", "yeruncle".toCharArray(),
-					"Clarence Witherspoon", "801-555-1212", "bobs@yeruncle.com",
-					Arrays.asList(
-						new Address("555 Main Street", "Salt Lake City", "UT", "84101"),
-						new Address("1600 Pennsylvania Avenue", "Washington", "D.C.", "10000"),
-						new Address("1 Infinite Loop", "San Jose", "CA", "94000")
-					)));
-		}
-	}
-			
-	
-	private final MalformedBatchRepository malformed = new MalformedBatchRepository() {
+	private final MalformedIdentityRepository malformed = new MalformedIdentityRepository() {
 		
 		@Override
 		public void addIdentity(InputStream message, String reason) {
+			System.out.println("Logging malformed identity: " + reason);
 			Generator.waitFor(1000);
 		}
 		
@@ -69,6 +55,20 @@ public class IdentityPipelineTest {
 	private class CappedIdentityReader implements IdentityReader {
 		private AtomicInteger howMany;
 		private CountDownLatch cdl;
+		
+		private final List<Identity> identities = new ArrayList<>();
+		
+		{ 
+			for ( int i = 0; i < 1000; i++ ) {
+				identities.add(new Person("bobs", "yeruncle".toCharArray(),
+						"Clarence Witherspoon", "801-555-1212", "bobs@yeruncle.com",
+						Arrays.asList(
+							new Address("555 Main Street", "Salt Lake City", "UT", "84101"),
+							new Address("1600 Pennsylvania Avenue", "Washington", "D.C.", "10000"),
+							new Address("1 Infinite Loop", "San Jose", "CA", "94000")
+						)));
+			}
+		}
 		
 		public CappedIdentityReader(int howMany) {
 			this.howMany = new AtomicInteger(howMany);
@@ -157,7 +157,9 @@ public class IdentityPipelineTest {
 	};
 	
 	@Test
-	public void testSingleThreadedVersion() {
+	public void testHappyPath() {
+		MalformedIdentityRepository malformed =
+				new ProducerMalformedIdentityRepository(this.malformed);
 		IdentityPipeline ip = new IdentityPipeline(
 			malformed, 
 			
@@ -178,10 +180,10 @@ public class IdentityPipelineTest {
 	}
 	
 	@Test
-	public void testFireAndForgetMalformed() {
+	public void testMultiThreadedHappyPath() {
 		CountDownLatch cdl = new CountDownLatch(10);
 		IdentityService is = new ThreadedIdentityService();
-		MalformedBatchRepository malformed = malformedBatchRepository();
+		MalformedIdentityRepository malformed = malformedBatchRepository();
 		com.joshcummings.codeplay.concurrency.dependency.IdentityPipeline ip = 
 				new com.joshcummings.codeplay.concurrency.dependency.IdentityPipeline(
 			malformed, 
@@ -204,11 +206,11 @@ public class IdentityPipelineTest {
 			e.printStackTrace();
 		}
 		
-		List<Identity> identity = is.search(id -> true);
-		System.out.println(identity.size());
+		//List<Identity> identity = is.search(id -> true);
+		//System.out.println(identity.size());
 	}
 	
-	public MalformedBatchRepository malformedBatchRepository() {
-		return new ProducerConsumerMalformedBatchRepository(malformed);
+	public MalformedIdentityRepository malformedBatchRepository() {
+		return new ProducerMalformedIdentityRepository(malformed);
 	}
 }

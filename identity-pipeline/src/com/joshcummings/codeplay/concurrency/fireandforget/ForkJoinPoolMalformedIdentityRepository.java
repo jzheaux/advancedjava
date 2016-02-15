@@ -5,15 +5,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.joshcummings.codeplay.concurrency.Identity;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 
-public class ThreadPoolMalformedBatchRepository implements
-		MalformedBatchRepository {
-	private ExecutorService pool = Executors.newCachedThreadPool();
+public class ForkJoinPoolMalformedIdentityRepository implements
+		MalformedIdentityRepository {
+	private ExecutorService pool = Executors.newWorkStealingPool();
+
+	private MalformedIdentityRepository delegate;
 	
-	private MalformedBatchRepository delegate;
-	
-	public ThreadPoolMalformedBatchRepository(MalformedBatchRepository delegate) {
+	public ForkJoinPoolMalformedIdentityRepository(MalformedIdentityRepository delegate) {
 		this.delegate = delegate;
 	}
 	
@@ -26,5 +26,4 @@ public class ThreadPoolMalformedBatchRepository implements
 	public void addIdentity(InputStream message, String reason) {
 		pool.submit(() -> delegate.addIdentity(message, reason));
 	}
-
 }

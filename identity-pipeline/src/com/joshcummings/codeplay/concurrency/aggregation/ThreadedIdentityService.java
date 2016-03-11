@@ -1,61 +1,49 @@
 package com.joshcummings.codeplay.concurrency.aggregation;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityService;
 import com.joshcummings.codeplay.concurrency.Person;
 
 public class ThreadedIdentityService implements IdentityService {
-	private List<Identity> verifiedIdentities = new ArrayList<>();
-	
-	private ExecutorService es = Executors.newCachedThreadPool();
+	private Collection<Identity> verifiedIdentities = new ConcurrentLinkedQueue<>();
 	
 	@Override
 	public boolean persistOrUpdateBestMatch(Identity identity) {
-		PriorityQueue<MergeCandidate> candidates = new PriorityQueue<>();
+		class BestHolder { MergeCandidate best; }
+		BestHolder is = new BestHolder();
 		
-		// find candidates
-		for (Identity i : verifiedIdentities) {
-			int score = 0;
-			if ( i.getEmailAddress() != null && i.getEmailAddress().equals(identity.getEmailAddress()) ) {
-				score += 50;
-			}
-			if ( i.getPhoneNumber() != null && i.getPhoneNumber().equals(identity.getPhoneNumber()) ) {
-				score += 15;
-			}
-			if ( i.getName().equals(identity.getName()) ) {
-				score += 35;
-			}
-			if ( score >= 50 ) {
-				candidates.offer(new MergeCandidate(i, score));
+		for ( Identity i : verifiedIdentities ) {
+			if ( i.getLock().tryLock() ) {
+				try {
+					scoreMatch(identity, i).ifPresent(mergeable -> {
+						if ( is.best == null || mergeable.getScore() > is.best.getScore() ) {
+							is.best.getCandidate().getLock().unlock();
+							is.best = mergeable;
+							i.getLock().lock(); // get a second lock for the same thread
+						}
+					});
+				} catch ( Exception e ) {
+					// don't really eat!
+				} finally {
+					i.getLock().unlock();
+				}
 			}
 		}
 		
-		// pick the best one and lock on it
-		for ( MergeCandidate candidate : candidates ) {
-			Person id = (Person)candidate.getCandidate();
-			if ( id.getLock().tryLock() ) {
-				try {
-					if ( id.getEmailAddress() == null ) {
-						id.setEmailAddress(identity.getEmailAddress());
-					}
-					if ( id.getPhoneNumber() == null ) {
-						id.setPhoneNumber(identity.getPhoneNumber());
-					}
-					id.addAddresses(identity.getAddresses());
-					return true;
-				} catch ( Exception e ) {
-					// rollback, out of scope
-				} finally {
-					id.getLock().unlock();
-				}
+		if ( is.best != null ) {
+			try {
+				Person candidate = (Person)is.best.getCandidate();
+				merge((Person)identity, candidate);
+				return true;
+			} finally {
+				is.best.getCandidate().getLock().unlock();
 			}
 		}
 		
@@ -65,31 +53,35 @@ public class ThreadedIdentityService implements IdentityService {
 
 	@Override
 	public List<Identity> search(Predicate<Identity> pred) {
-		List<Identity> filtered = new ArrayList<>();
-		int min = Math.min(verifiedIdentities.size(), 8);
-		CountDownLatch cdl = new CountDownLatch(min);
-		for ( int i = 0; i < min; i++ ) {
-			int startIndex = i*verifiedIdentities.size() / min;
-			int endIndex = startIndex + verifiedIdentities.size() / min;
-			es.submit(() -> {
-				int j = 0;
-				for ( Identity id: verifiedIdentities ) {
-					if ( j >= startIndex && j < endIndex && pred.test(id) ) {
-						synchronized ( filtered ) {
-							filtered.add(id);
-						}
-						cdl.countDown();
-					}
-					j++;
-				}
-			});
-		}
-		try {
-			cdl.await();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-		return filtered;
+		return verifiedIdentities.parallelStream().filter(pred).collect(Collectors.toList());
 	}
 
+	private Optional<MergeCandidate> scoreMatch(Identity incoming, Identity existing) {
+		int score = 0;
+		if ( existing.getEmailAddress() != null &&
+				existing.getEmailAddress().equals(incoming.getEmailAddress()) ) {
+			score += 50;
+		}
+		if ( existing.getPhoneNumber() != null && 
+				existing.getPhoneNumber().equals(incoming.getPhoneNumber()) ) {
+			score += 15;
+		}
+		if ( existing.getName().equals(incoming.getName()) ) {
+			score += 35;
+		}
+		if ( score >= 50 ) {
+			return Optional.of(new MergeCandidate(existing, score));
+		}
+		return Optional.empty();
+	}
+	
+	private void merge(Person incoming, Person existing) {
+		if ( existing.getEmailAddress() == null ) {
+			existing.setEmailAddress(incoming.getEmailAddress());
+		}
+		if ( existing.getPhoneNumber() == null ) {
+			existing.setPhoneNumber(incoming.getPhoneNumber());
+		}
+		existing.addAddresses(incoming.getAddresses());
+	}
 }

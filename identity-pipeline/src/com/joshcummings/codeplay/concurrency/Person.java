@@ -26,7 +26,8 @@ public class Person implements Identity {
 	private final ReentrantLock lock = new ReentrantLock();
 	
 	public Person(String username, char[] password, String name,
-			String phoneNumber, String emailAddress, List<Address> addresses) {
+			String phoneNumber, String emailAddress, List<Address> addresses,
+			Integer age) {
 		this.id = ++ID_SOURCE;
 		this.username = username;
 		this.password = password;

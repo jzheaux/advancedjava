@@ -30,18 +30,18 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 	@Override
 	public Identity read(InputStream is) {
 		try ( CopyingInputStream cis = new CopyingInputStream(is); ) {
-			Identity i = primary.read(cis);
-			if ( i instanceof BadIdentity ) { 
-				Identity result = scatterGatherer.go(new ReaderScatterer(cis, secondary), new IdentityGatherer());
-				
-				if ( result instanceof BadIdentity ) {
-					malformed.addIdentity(cis.reread(), "Tried all identity serialization strategies and all failed");
-				} else { 
-					return result;
-				}
-			} else {
-				return i;
+			Identity result = primary.read(cis);
+			if ( isOkay(result) ) {
+				return result;
 			}
+			
+			result = scatterGatherer.go(new ReaderScatterer(cis, secondary), new IdentityGatherer());
+			
+			if ( isOkay(result) ) {
+				return result;
+			}
+			
+			malformed.addIdentity(cis.reread(), "All readers failed :(");
 		} catch ( IOException e ) {
 			throw new IllegalStateException("Something terrible happened with the re-read stream", e);
 		}
@@ -49,6 +49,10 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 		return read(is);
 	}
 
+	private boolean isOkay(Identity identity) {
+		return !(identity instanceof BadIdentity);
+	}
+	
 	public static class ReaderScatterer implements Scatterer {
 		private int index;
 		private List<IdentityReader> readers;

@@ -16,12 +16,18 @@ public interface IdentityService {
 			this.candidate = candidate;
 			this.score = score;
 		}
+
 		public Identity getCandidate() {
 			return candidate;
 		}
+		
 		@Override
 		public int compareTo(MergeCandidate that) {
 			return this.score.compareTo(that.score);
+		}
+		
+		public int getScore() {
+			return score;
 		}
 	}
 }

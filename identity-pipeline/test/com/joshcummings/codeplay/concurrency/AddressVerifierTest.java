@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.joshcummings.codeplay.concurrency.threaded.Batcher;
+import com.joshcummings.codeplay.concurrency.throttle.Batcher;
 
 public class AddressVerifierTest {
 

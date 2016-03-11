@@ -37,7 +37,7 @@ public class MultiStrategyIdentityReaderTest {
 			try {
 				int i = is.read();
 				Generator.waitFor(i - 48 == index ? 100 : 1000);
-				return i - 48 == index ? new Person(null, null, null, null, null, Collections.emptyList()) : new BadIdentity();
+				return i - 48 == index ? new Person(null, null, null, null, null, Collections.emptyList(), null) : new BadIdentity();
 			} catch (IOException e) {
 				return new BadIdentity();
 			}
@@ -62,26 +62,24 @@ public class MultiStrategyIdentityReaderTest {
 	public void testSingleThreaded() {
 		ScatterGatherer sg = new SingleThreadedScatterGatherer();
 		MultiStrategyIdentityReader reader = new MultiStrategyIdentityReader(readers, sg, malformed);
-		for (int i = 0; i < NUM_IDENTITIES; i++) {
-			System.out.println("Identity #" + i);
-			reader.read(bais);
-		}
+		readIdentities(sg, reader);
 	}
 
 	@Test
 	public void testExecutorService() {
 		ScatterGatherer sg = new ExecutorServiceScatterGatherer();
 		MultiStrategyIdentityReader reader = new MultiStrategyIdentityReader(readers, sg, malformed);
-		for (int i = 0; i < NUM_IDENTITIES; i++) {
-			System.out.println("Identity #" + i);
-			reader.read(bais);
-		}
+		readIdentities(sg, reader);
 	}
 
 	@Test
 	public void testExecutorCompletionService() {
 		ScatterGatherer sg = new ExecutorCompletionServiceScatterGatherer();
 		MultiStrategyIdentityReader reader = new MultiStrategyIdentityReader(readers, sg, malformed);
+		readIdentities(sg, reader);
+	}
+	
+	private void readIdentities(ScatterGatherer sg, MultiStrategyIdentityReader reader) {
 		for (int i = 0; i < NUM_IDENTITIES; i++) {
 			System.out.println("Identity #" + i);
 			reader.read(bais);

@@ -12,12 +12,12 @@ import java.util.function.Predicate;
 import org.junit.Test;
 
 import com.joshcummings.codeplay.concurrency.aggregation.LockableStatsLedger;
+import com.joshcummings.codeplay.concurrency.aggregation.ThreadSafeStatsLedger;
 import com.joshcummings.codeplay.concurrency.aggregation.ThreadedIdentityService;
 import com.joshcummings.codeplay.concurrency.fireandforget.ProducerMalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.fireandforget.ThreadPoolExecutorMalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.single.IdentityPipeline;
 import com.joshcummings.codeplay.concurrency.single.MultiStrategyIdentityReader;
-import com.joshcummings.codeplay.concurrency.single.SimpleStatsLedger;
 import com.joshcummings.codeplay.concurrency.splitting.ShortCircuitingMultiStrategyIdentityReader;
 import com.joshcummings.codeplay.concurrency.throttle.BatchingAddressVerifier;
 
@@ -66,7 +66,7 @@ public class IdentityPipelineTest {
 							new Address("555 Main Street", "Salt Lake City", "UT", "84101"),
 							new Address("1600 Pennsylvania Avenue", "Washington", "D.C.", "10000"),
 							new Address("1 Infinite Loop", "San Jose", "CA", "94000")
-						)));
+						), 34));
 			}
 		}
 		
@@ -143,17 +143,17 @@ public class IdentityPipelineTest {
 	};
 	
 	private final StatsLedger sc = new StatsLedger() {
-		
 		@Override
 		public void recordEntry(StatsEntry entry) {
 			Generator.waitFor(10);
 		}
 		
-		
 		@Override
-		public Integer getRecordCount() {
-			return 0;
-		}
+		public Integer getRecordCount() { return 0; }
+		
+		public Integer getAgeCount(Integer age) { return 0; }
+		public Integer getFirstNameCount(String firstName) { return 0; }
+		public Integer getLastNameCount(String lastName) { return 0; }
 	};
 	
 	@Test
@@ -195,7 +195,7 @@ public class IdentityPipelineTest {
 			pnf,
 			ef,
 			is,
-			new LockableStatsLedger(new SimpleStatsLedger())
+			new LockableStatsLedger(new ThreadSafeStatsLedger())
 		);
 		
 		ip.process(null);

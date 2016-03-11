@@ -1,4 +1,4 @@
-package com.joshcummings.codeplay.concurrency.single;
+package com.joshcummings.codeplay.concurrency.aggregation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,24 +13,20 @@ public class SimpleStatsLedger implements StatsLedger {
 
 	@Override
 	public void recordEntry(StatsEntry entry) {
-		Integer count = withDefault(firstNameMap.get(entry.getFirstName()), 0);
-		firstNameMap.put(entry.getFirstName(), count + 1);
+		increment(firstNameMap, entry.getFirstName());
 		
-		count = withDefault(lastNameMap.get(entry.getLastName()), 0);
-		lastNameMap.put(entry.getLastName(), count);
+		increment(lastNameMap, entry.getLastName());
 		
-		count = withDefault(ageMap.get(entry.getAge()), 0);
-		ageMap.put(entry.getAge(), count);
-		
-		System.out.println("Increasing record count");
+		increment(ageMap, entry.getAge());
+
 		recordCount++;
 	}
 	
-	private Integer withDefault(Integer value, Integer backup) {
-		if ( value != null ) {
-			return value;
+	private <T> void increment(Map<T, Integer> map, T key) {
+		Integer count = map.putIfAbsent(key, 1);
+		if ( count != null ) {
+			map.put(key, count + 1);
 		}
-		return backup;
 	}
 
 	@Override
@@ -38,18 +34,15 @@ public class SimpleStatsLedger implements StatsLedger {
 		return recordCount;
 	}
 
-	@Override
-	public Integer getAgeCount(Integer age) {
-		return ageMap.get(age);
-	}
-	
-	@Override
 	public Integer getFirstNameCount(String firstName) {
 		return firstNameMap.get(firstName);
 	}
-
-	@Override
+	
 	public Integer getLastNameCount(String lastName) {
 		return lastNameMap.get(lastName);
+	}
+	
+	public Integer getAgeCount(Integer age) {
+		return ageMap.get(age);
 	}
 }

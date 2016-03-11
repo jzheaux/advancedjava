@@ -1,39 +1,41 @@
 package com.joshcummings.codeplay.concurrency.splitting;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.joshcummings.codeplay.concurrency.Identity;
 
 public class ExecutorCompletionServiceScatterGatherer implements ScatterGatherer {
-	private ExecutorService pool = Executors.newCachedThreadPool();
+	private final ExecutorService pool = Executors.newCachedThreadPool();
 
-	public Identity go(Scatterer scatterer, Gatherer gatherer) {
+	@Override
+	public Identity go(Scatterer s, Gatherer g) {
 		ExecutorCompletionService<Identity> ecs = new ExecutorCompletionService<>(pool);
-		fireTasks(scatterer, ecs);
-		return gatherResults(gatherer, ecs);
-	}
-	
-	private <PART> void fireTasks(Scatterer scatterer, ExecutorCompletionService<Identity> ecs) {
-		while ( scatterer.hasNext() ) {
-			ecs.submit(scatterer.next());
+		//Queue<Future<Identity>> futures = new LinkedList<>();
+		
+		int numberOfTasks = 0;
+		while ( s.hasNext() ) {
+			ecs.submit(s.next());
+			numberOfTasks++;
+			//Future<Identity> future = pool.submit(s.next());
+			//futures.offer(future);
 		}
-	}
-	
-	private Identity gatherResults(Gatherer gatherer, ExecutorCompletionService<Identity> ecs) {
-		while ( gatherer.needsMore() ) {
+		
+		while ( numberOfTasks > 0 && g.needsMore() ) {
 			try {
-				Identity result = ecs.take().get();
-				gatherer.gatherResult(result);
-			} catch ( InterruptedException e ) {
-				Thread.currentThread().interrupt();
-			} catch ( ExecutionException e ) {
-				// log and move on to the next task
+				Identity i = ecs.take().get();//futures.poll().get();
+				g.gatherResult(i);
+				numberOfTasks--;
+			} catch ( InterruptedException | ExecutionException e ) {
+				e.printStackTrace();
 			}
 		}
-		return gatherer.getFinalResult();
+		
+		return g.getFinalResult();
 	}
-
 }

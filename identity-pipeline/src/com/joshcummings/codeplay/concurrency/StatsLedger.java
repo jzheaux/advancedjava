@@ -5,6 +5,9 @@ public interface StatsLedger {
 	void recordEntry(StatsEntry entry);
 	
 	Integer getRecordCount();
+	Integer getFirstNameCount(String firstName);
+	Integer getLastNameCount(String lastName);
+	Integer getAgeCount(Integer age);
 	
 	public class StatsEntry {
 		private final String firstName;

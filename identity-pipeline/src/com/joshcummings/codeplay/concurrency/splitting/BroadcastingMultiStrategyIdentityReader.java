@@ -12,7 +12,8 @@ import java.util.concurrent.Future;
 import com.joshcummings.codeplay.concurrency.BadIdentity;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
+import com.joshcummings.codeplay.concurrency.single.CopyingInputStream;
 import com.joshcummings.codeplay.concurrency.single.MultiStrategyIdentityReader;
 
 public class BroadcastingMultiStrategyIdentityReader extends
@@ -21,7 +22,7 @@ public class BroadcastingMultiStrategyIdentityReader extends
 	private ExecutorService pool = Executors.newCachedThreadPool();
 	
 	public BroadcastingMultiStrategyIdentityReader(
-			List<IdentityReader> readers, MalformedBatchRepository repository) {
+			List<IdentityReader> readers, MalformedIdentityRepository repository) {
 		super(readers, repository);
 	}
 

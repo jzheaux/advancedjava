@@ -12,17 +12,17 @@ import java.util.concurrent.Executors;
 import com.joshcummings.codeplay.concurrency.BadIdentity;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 
 public class ShortCircuitingMultiStrategyIdentityReader implements
 		IdentityReader {
 	private IdentityReader primary;
 	private List<IdentityReader> readers;
-	private MalformedBatchRepository malformed;
+	private MalformedIdentityRepository malformed;
 	
 	private ExecutorService es = Executors.newCachedThreadPool();
 
-	public ShortCircuitingMultiStrategyIdentityReader(List<IdentityReader> readers, MalformedBatchRepository repository) {
+	public ShortCircuitingMultiStrategyIdentityReader(List<IdentityReader> readers, MalformedIdentityRepository repository) {
 		this.primary = readers.stream().findFirst().orElseThrow(IllegalArgumentException::new);
 		this.readers = readers.subList(1, readers.size());
 		this.malformed = repository;

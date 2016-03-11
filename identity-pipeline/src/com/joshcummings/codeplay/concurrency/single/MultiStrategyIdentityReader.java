@@ -8,15 +8,15 @@ import java.util.List;
 
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 
 
 public class MultiStrategyIdentityReader implements IdentityReader {
 	protected final IdentityReader primary;
 	protected final List<IdentityReader> readers;
-	protected final MalformedBatchRepository repository;
+	protected final MalformedIdentityRepository repository;
 	
-	public MultiStrategyIdentityReader(List<IdentityReader> readers, MalformedBatchRepository repository) {
+	public MultiStrategyIdentityReader(List<IdentityReader> readers, MalformedIdentityRepository repository) {
 		this.primary = readers.stream().findFirst().orElseThrow(IllegalArgumentException::new);
 		this.readers = readers.subList(1, readers.size());
 		this.repository = repository;
@@ -43,33 +43,6 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 		}
 
 		return read(is);
-	}
-	
-	protected static class CopyingInputStream extends InputStream {
-		private InputStream is;
-		private ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
-		public CopyingInputStream(InputStream is) {
-			this.is = is;
-		}
-		
-		@Override
-		public int read() throws IOException {
-			int i = is.read();
-			if ( i != -1 ) {
-				baos.write(i);
-			}
-			return i;
-		}
-		
-		public InputStream reread() {
-			return new ByteArrayInputStream(baos.toByteArray());
-		}
-		
-		@Override
-		public void close() throws IOException {
-			is.close();
-		}
 	}
 
 }

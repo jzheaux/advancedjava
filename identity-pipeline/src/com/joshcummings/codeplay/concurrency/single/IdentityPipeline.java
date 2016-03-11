@@ -7,14 +7,14 @@ import com.joshcummings.codeplay.concurrency.EmailFormatter;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
 import com.joshcummings.codeplay.concurrency.IdentityService;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
 import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.StatsLedger.StatsEntry;
 
 public class IdentityPipeline {
-	private MalformedBatchRepository malformed; // fire and forget
+	private MalformedIdentityRepository malformed;
 	private IdentityReader identityReader; 
 	private AddressVerifier addressVerifier;
 	private PhoneNumberFormatter phoneNumberFormatter;
@@ -22,7 +22,7 @@ public class IdentityPipeline {
 	private IdentityService identityService;
 	private StatsLedger statsLedger;
 		
-	public IdentityPipeline(MalformedBatchRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
+	public IdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
 			PhoneNumberFormatter phoneNumberFormatter, EmailFormatter emailFormatter, IdentityService identityService, StatsLedger statsLedger) {
 		this.malformed = malformed;
 		this.identityReader = identityReader;
@@ -37,7 +37,6 @@ public class IdentityPipeline {
 		Identity i;
 		while ( ( i = readIdentity(input) ) != null ){
 			final Identity identity = i;
-			// verify address
 			try {
 				validateAddresses(identity);
 				
@@ -47,7 +46,7 @@ public class IdentityPipeline {
 				if ( !identityService.persistOrUpdateBestMatch(identity) ) {
 					statsLedger.recordEntry(new StatsEntry(identity));
 				}
-			} catch ( NoValidAddressesException e ) {
+			} catch ( Exception e ) {
 				malformed.addIdentity(identity, e.getMessage());
 			}
 		}

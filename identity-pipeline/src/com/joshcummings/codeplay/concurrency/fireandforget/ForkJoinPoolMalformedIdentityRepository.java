@@ -5,17 +5,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.joshcummings.codeplay.concurrency.Identity;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 
-public class ForkJoinPoolMalformedBatchRepository implements
-		MalformedBatchRepository {
+public class ForkJoinPoolMalformedIdentityRepository implements
+		MalformedIdentityRepository {
 	// To get a work-stealing thread pool is as simple as calling a different static
 	// method.
+
 	private ExecutorService pool = Executors.newWorkStealingPool();
+
+	private MalformedIdentityRepository delegate;
 	
-	private MalformedBatchRepository delegate;
-	
-	public ForkJoinPoolMalformedBatchRepository(MalformedBatchRepository delegate) {
+	public ForkJoinPoolMalformedIdentityRepository(MalformedIdentityRepository delegate) {
 		this.delegate = delegate;
 	}
 	

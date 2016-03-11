@@ -26,6 +26,9 @@ public class AsyncMultiStrategyIdentityReader extends
 
 	private ExecutorService pool = Executors.newWorkStealingPool();
 	
+	// The basic callback pattern exposes a callback as a parameter and typically
+	// precipitates heavier nesting (sometimes called "Callback Hell")
+	// in order to maintain appropriate closure context
 	public void readAsync(InputStream is, Consumer<Identity> c) {
 		CopyingInputStream cis = new CopyingInputStream(is);
 		readAsyncPrimary(cis, (future) -> {

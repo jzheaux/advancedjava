@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 public interface IdentityService {
 	boolean persistOrUpdateBestMatch(Identity identity);
 
+	Identity getOne(Predicate<Identity> pred);
 	List<Identity> search(Predicate<Identity> pred);
 	
 	public class MergeCandidate implements Comparable<MergeCandidate> {

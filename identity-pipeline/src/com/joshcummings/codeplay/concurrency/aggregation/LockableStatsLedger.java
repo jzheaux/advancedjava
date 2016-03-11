@@ -36,7 +36,12 @@ public class LockableStatsLedger implements StatsLedger {
 	
 	@Override
 	public Integer getRecordCount() {
-		return delegate.getRecordCount();
+		lock.lock();
+		try {
+			return delegate.getRecordCount();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override

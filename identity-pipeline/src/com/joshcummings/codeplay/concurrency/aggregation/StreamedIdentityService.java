@@ -1,33 +1,22 @@
-package com.joshcummings.codeplay.concurrency.single;
+package com.joshcummings.codeplay.concurrency.aggregation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityService;
 import com.joshcummings.codeplay.concurrency.Person;
 
-public class SimpleIdentityService implements IdentityService {
-	private List<Identity> verifiedIdentities = new ArrayList<>();
+public class StreamedIdentityService implements IdentityService {
+	private volatile List<Identity> verifiedIdentities = new ArrayList<>();
 	
-	private static class MergeCandidate implements Comparable<MergeCandidate> {
-		private final Identity candidate;
-		private final Integer score;
-		
-		public MergeCandidate(Identity candidate, Integer score) {
-			this.candidate = candidate;
-			this.score = score;
-		}
-		public Identity getCandidate() {
-			return candidate;
-		}
-		@Override
-		public int compareTo(MergeCandidate that) {
-			return this.score.compareTo(that.score);
-		}
-	}
+	private ExecutorService es = Executors.newWorkStealingPool();
 	
 	@Override
 	public boolean persistOrUpdateBestMatch(Identity identity) {
@@ -53,7 +42,7 @@ public class SimpleIdentityService implements IdentityService {
 		// pick the best one and lock on it
 		for ( MergeCandidate candidate : candidates ) {
 			Person id = (Person)candidate.getCandidate();
-			if ( id.getLock().tryLock() ) {
+			if ( id.getLock().tryLock() ) { // we are locking this against other threads processing other identities
 				try {
 					if ( id.getEmailAddress() == null ) {
 						id.setEmailAddress(identity.getEmailAddress());
@@ -64,36 +53,42 @@ public class SimpleIdentityService implements IdentityService {
 					id.addAddresses(identity.getAddresses());
 					return true;
 				} catch ( Exception e ) {
-					// rollback, out of scope
+					// rollback, out of scope for this demo
 				} finally {
 					id.getLock().unlock();
 				}
 			}
+		}	
+		
+		synchronized ( verifiedIdentities ) {
+			verifiedIdentities.add(identity);
 		}
 		
-		verifiedIdentities.add(identity);
 		return false;
 	}
 
-	@Override
-	public Identity getOne(Predicate<Identity> pred) {
-		for ( Identity i : verifiedIdentities ) {
-			if ( pred.test(i) ) {
-				return i;
-			}
+	// Notice the fact that we are submitting this inside a thread. The reason for this is to force
+	// Java to use our provided thread pool instead of ForkJoinPool.commonPool()
+	public Identity getOne(Predicate<Identity> p) {
+		try {
+			return es.submit(
+						() -> verifiedIdentities.parallelStream().filter(p).findAny().get()
+					).get(); 
+		} catch ( ExecutionException | InterruptedException e ) {
+			Thread.currentThread().interrupt();
+			return null;
 		}
-		return null;
 	}
 	
 	@Override
 	public List<Identity> search(Predicate<Identity> pred) {
-		List<Identity> filtered = new ArrayList<>();
-		for ( Identity i : verifiedIdentities ) {
-			if ( pred.test(i) ) {
-				filtered.add(i);
-			}
+		try {
+			return es.submit(
+						() -> verifiedIdentities.parallelStream().filter(pred).collect(Collectors.toList())
+					).get();
+		} catch ( ExecutionException | InterruptedException e ) {
+			Thread.currentThread().interrupt();
+			return new ArrayList<>();
 		}
-		return filtered;
 	}
-
 }

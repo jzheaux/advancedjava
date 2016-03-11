@@ -48,8 +48,51 @@ public class CompletableFutureIdentityPipeline {
 		this.identityService = identityService;
 		this.statsLedger = statsLedger;
 	}
-	
+
 	public void process(InputStream input) {
+		CompletableFuture.supplyAsync(() -> readIdentity(input))
+			.thenAccept(
+				(identity) -> {
+ 					if ( identity != null ) {
+						if ( !(identity instanceof BadIdentity) ) {
+	 						es.submit(() ->
+								{
+									try {	
+										CompletableFuture<Void> addresses = CompletableFuture.runAsync(() -> validateAddresses(identity));
+										CompletableFuture<Void> phone = CompletableFuture.runAsync(() -> phoneNumberFormatter.format(identity));
+										CompletableFuture<Void> emailAddress = CompletableFuture.runAsync(() -> emailFormatter.format(identity));
+										
+										
+										// Note that regardless, allOf returns a CompletableFuture<Void> meaning
+										// that the results of the individual CFs will not be passed through to
+										// any of the continuations. You can, of course, simply retreive those
+										// results by referencing them directly
+										
+										CompletableFuture.allOf(addresses, phone, emailAddress)
+											.thenRunAsync(() -> {
+												// If we call addresses.get(), we can get the result, and it will not block since
+												// the semantics of allOf are that addresses, phone, and emailAddress have all completed
+												if ( !identityService.persistOrUpdateBestMatch(identity) ) {
+													statsLedger.recordEntry(new StatsEntry(identity));
+												}
+											}).exceptionally((e) -> {
+												malformed.addIdentity(identity, e.getMessage());
+												return null;
+											}).get();
+			
+									} catch ( ExecutionException e ) {
+										malformed.addIdentity(identity, e.getMessage());
+									} catch ( InterruptedException e ) {
+										Thread.currentThread().interrupt();
+									}
+								});
+						}
+						process(input);
+					}
+				});
+	}
+	
+	public void processOld(InputStream input) {
 		Identity i;
 		while ( ( i = readIdentity(input) ) != null ){
 			final Identity identity = i;

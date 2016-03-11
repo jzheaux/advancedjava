@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 public class Batcher<T extends Observable> {
 	/* The backlog of jobs to perform */
-	private Queue<T> jobQueue = new ConcurrentLinkedQueue<>();
+	private BlockingQueue<T> jobQueue = new LinkedBlockingQueue<>();
 	
 	/* The cyclic barrier causes {batchSize} threads to wait at a time */
 	private final CyclicBarrier batcher;
@@ -40,11 +42,12 @@ public class Batcher<T extends Observable> {
 	 */
 	private List<T> pollBatch(Queue<T> queue) {
 		List<T> batch = new ArrayList<>(batchSize);
-		int count = 0;
+		jobQueue.drainTo(batch, batchSize);
+		/*int count = 0;
 		while ( count < batchSize ) {
 			batch.add(queue.poll());
 			count++;
-		}
+		}*/
 		return batch;
 	}
 	

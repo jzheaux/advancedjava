@@ -36,7 +36,7 @@ public class BroadcastingMultiStrategyIdentityReader extends
 				for ( IdentityReader reader : readers ) {
 					tasks.add(new Callable<Identity>() {
 						@Override
-						public Identity call() throws Exception {
+						public Identity call() {
 							try {
 								return reader.read(cis.reread());
 							} catch ( Exception e ) {
@@ -48,6 +48,7 @@ public class BroadcastingMultiStrategyIdentityReader extends
 
 				try {
 					List<Future<Identity>> futures = pool.invokeAll(tasks);
+					
 					for ( Future<Identity> future : futures ) {
 						try {
 							Identity candidate = future.get();
@@ -59,7 +60,7 @@ public class BroadcastingMultiStrategyIdentityReader extends
 						}
 					}
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+					Thread.currentThread().interrupt();
 				}
 				
 				repository.addIdentity(cis.reread(), "Tried all identity serialization strategies and all failed");

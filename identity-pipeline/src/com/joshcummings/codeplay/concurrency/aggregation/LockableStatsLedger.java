@@ -1,11 +1,9 @@
 package com.joshcummings.codeplay.concurrency.aggregation;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 
@@ -33,7 +31,12 @@ public class LockableStatsLedger implements StatsLedger {
 	
 	@Override
 	public Integer getRecordCount() {
-		return delegate.getRecordCount();
+		lock.lock();
+		try {
+			return delegate.getRecordCount();
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	public void publish() {

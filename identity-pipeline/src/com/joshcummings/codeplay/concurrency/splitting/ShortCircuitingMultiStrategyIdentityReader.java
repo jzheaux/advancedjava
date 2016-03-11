@@ -47,10 +47,14 @@ public class ShortCircuitingMultiStrategyIdentityReader implements
 						});
 					}
 					
+					// here, blocking time will be the time for the fastest to return
+					// as opposed the time for the first to be invoked
 					try {
-						Identity i = ecs.take().get();
-						if ( !(i instanceof BadIdentity) ) {
-							return i;
+						for ( IdentityReader reader : readers ) {
+							Identity i = ecs.take().get();
+							if ( !(i instanceof BadIdentity) ) {
+								return i;
+							}
 						}
 					} catch ( Exception f ) {
 						// fall through to below

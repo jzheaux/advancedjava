@@ -139,6 +139,11 @@ public class IdentityPipelineTest {
 		public List<Identity> search(Predicate<Identity> pred) {
 			return null;
 		}
+
+		@Override
+		public Identity getOne(Predicate<Identity> pred) {
+			return null;
+		}
 		
 	};
 	

@@ -10,13 +10,12 @@ import java.util.concurrent.Executors;
 import com.joshcummings.codeplay.concurrency.BadIdentity;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
-import com.joshcummings.codeplay.concurrency.MalformedBatchRepository;
+import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
+import com.joshcummings.codeplay.concurrency.single.CopyingInputStream;
 import com.joshcummings.codeplay.concurrency.single.MultiStrategyIdentityReader;
 
 public class StreamingMultiStrategyIdentityReader extends MultiStrategyIdentityReader {
-	private ExecutorService es = Executors.newCachedThreadPool();
-
-	public StreamingMultiStrategyIdentityReader(List<IdentityReader> readers, MalformedBatchRepository repository) {
+	public StreamingMultiStrategyIdentityReader(List<IdentityReader> readers, MalformedIdentityRepository repository) {
 		super(readers, repository);
 	}
 	

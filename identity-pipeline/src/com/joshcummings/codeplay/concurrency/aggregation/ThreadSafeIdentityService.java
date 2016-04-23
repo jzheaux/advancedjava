@@ -1,6 +1,8 @@
 package com.joshcummings.codeplay.concurrency.aggregation;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,11 +22,9 @@ import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityService;
 import com.joshcummings.codeplay.concurrency.Person;
 
-public class ThreadedIdentityService implements IdentityService {
+public class ThreadSafeIdentityService implements IdentityService {
 	private volatile Queue<Identity> verifiedIdentities = new ConcurrentLinkedQueue<>();
-	
-	private ExecutorService es = Executors.newWorkStealingPool();
-	
+
 	@Override
 	public boolean persistOrUpdateBestMatch(Identity identity) {
 		class BestHolder { MergeCandidate best; }
@@ -34,7 +35,7 @@ public class ThreadedIdentityService implements IdentityService {
 				try {
 					scoreMatch(identity, i).ifPresent(mergeable -> {
 						if ( is.best == null || mergeable.getScore() > is.best.getScore() ) {
-							is.best.getCandidate().getLock().unlock();
+							if ( is.best != null ) is.best.getCandidate().getLock().unlock();
 							is.best = mergeable;
 							i.getLock().lock(); // get a second lock for the same thread
 						}
@@ -62,41 +63,38 @@ public class ThreadedIdentityService implements IdentityService {
 		return false;
 	}
 
+	private ExecutorService pool = Executors.newWorkStealingPool();
+	
+	// Notice the fact that we are submitting this inside a thread. The reason for this is to force
+	// Java to use our provided thread pool instead of ForkJoinPool.commonPool()
+	@Override
 	public Identity getOne(Predicate<Identity> p) {
-		BlockingQueue<Identity> identities = new LinkedBlockingQueue<Identity>(verifiedIdentities);
-		int size = identities.size();
-		BlockingQueue<Identity> result = new LinkedBlockingQueue<>();
-		
-		int segments = Math.min((int)Math.ceil(size / 8d), 8);
-		while ( !identities.isEmpty() ) {
-			Queue<Identity> segment = new LinkedList<>();
-			identities.drainTo(segment, (int)Math.ceil(size / (segments*1.0)));
-			es.submit(() -> {
-				while ( !segment.isEmpty() && result.isEmpty() ) {
-					Identity candidate = segment.poll();
-					if ( p.test(candidate) )  {
-						result.add(candidate);
-					}
-				}
-			});
-		}
-		
-		// Again, there are several threads running concurrently; however, since we only
-		// care about a single result, we only need to wait for the shared object to have a
-		// single value to proceed.
 		try {
-			return result.take();
-		} catch (InterruptedException e) {
+			return pool.submit(
+						() -> verifiedIdentities.parallelStream().filter(p).findAny().get()
+					).get(); 
+		} catch ( ExecutionException | InterruptedException e ) {
 			Thread.currentThread().interrupt();
-			return null; // ???
+			return null;
 		}
 	}
 	
 	@Override
 	public List<Identity> search(Predicate<Identity> pred) {
-		return verifiedIdentities.parallelStream().filter(pred).collect(Collectors.toList());
+		try {
+			return pool.submit(
+						() -> verifiedIdentities.parallelStream().filter(pred).collect(Collectors.toList())
+					).get();
+		} catch ( ExecutionException | InterruptedException e ) {
+			Thread.currentThread().interrupt();
+			return Collections.emptyList();
+		}
 	}
-
+	
+	public Queue<Identity> getVerifiedIdentities() {
+		return verifiedIdentities;
+	}
+	
 	private Optional<MergeCandidate> scoreMatch(Identity incoming, Identity existing) {
 		int score = 0;
 		if ( existing.getEmailAddress() != null &&

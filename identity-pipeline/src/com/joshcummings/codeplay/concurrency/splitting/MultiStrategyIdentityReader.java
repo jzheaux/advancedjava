@@ -30,12 +30,14 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 	@Override
 	public Identity read(InputStream is) {
 		try ( CopyingInputStream cis = new CopyingInputStream(is); ) {
-			Identity result = primary.read(cis);
-			if ( isOkay(result) ) {
-				return result;
+			synchronized ( is ) {
+				Identity result = primary.read(cis);
+				if ( isOkay(result) ) {
+					return result;
+				}
 			}
 			
-			result = scatterGatherer.go(new ReaderScatterer(cis, secondary), new IdentityGatherer());
+			Identity result = scatterGatherer.go(new ReaderScatterer(cis, secondary), new IdentityGatherer());
 			
 			if ( isOkay(result) ) {
 				return result;
@@ -70,7 +72,7 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 
 		@Override
 		public Callable<Identity> next() {
-			System.out.println(Thread.currentThread() + " says 'next' " + index);
+			//System.out.println(Thread.currentThread() + " says 'next' " + index);
 			final int which = index++;
 			return () -> readers.get(which).read(cis.reread());
 		}
@@ -86,7 +88,7 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 
 		@Override
 		public void gatherResult(Identity result) {
-			System.out.println(Thread.currentThread() + " says 'gatherResult'");
+			//System.out.println(Thread.currentThread() + " says 'gatherResult'");
 			this.result = result;
 		}
 

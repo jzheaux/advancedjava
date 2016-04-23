@@ -33,11 +33,6 @@ public class ConnectionLimitingAddressVerifier implements AddressVerifier {
 	private static class ConfigurableSemaphore {
 		private ReentrantLock inTransition;
 		private Semaphore active;
-		/*private Semaphore inactive;
-		
-		private Condition transitionComplete = inTransition.newCondition();
-		
-		private int permits;*/
 		
 		public ConfigurableSemaphore(int permits) {
 			setPermits(permits);

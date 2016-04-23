@@ -4,10 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class CopyingInputStream extends InputStream {
 	private InputStream is;
 	private ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	
+	private ReentrantLock lock;
 	
 	public CopyingInputStream(InputStream is) {
 		this.is = is;
@@ -26,8 +29,11 @@ public class CopyingInputStream extends InputStream {
 		return new CopyingInputStream(new ByteArrayInputStream(baos.toByteArray()));
 	}
 	
+	public ReentrantLock getLock() {
+		return lock;
+	}
+	
 	@Override
 	public void close() throws IOException {
-		if ( is != null ) is.close();
 	}
 }

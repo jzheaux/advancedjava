@@ -11,10 +11,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.StreamSupport;
 
 import com.joshcummings.codeplay.concurrency.Address;
 import com.joshcummings.codeplay.concurrency.AddressVerifier;
@@ -56,7 +58,6 @@ public class BatchingAddressVerifier implements AddressVerifier {
 	public void verify(List<Address> addresses) {
 		Queue<Address> overflow = new ConcurrentLinkedQueue<>(addresses);
 		CountDownLatch cdl = new CountDownLatch(addresses.size());
-		
 		addresses.stream().map(address ->
 			new Address(address.getAddress1(), address.getCity(), address.getState(), address.getZipCode()) {
 				public void setVerified(boolean verified) {

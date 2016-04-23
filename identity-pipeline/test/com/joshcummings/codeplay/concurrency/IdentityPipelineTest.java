@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.joshcummings.codeplay.concurrency.aggregation.LockableStatsLedger;
 import com.joshcummings.codeplay.concurrency.aggregation.ThreadSafeStatsLedger;
-import com.joshcummings.codeplay.concurrency.aggregation.ThreadedIdentityService;
+import com.joshcummings.codeplay.concurrency.aggregation.ThreadSafeIdentityService;
 import com.joshcummings.codeplay.concurrency.fireandforget.ProducerMalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.fireandforget.ThreadPoolExecutorMalformedIdentityRepository;
 import com.joshcummings.codeplay.concurrency.single.IdentityPipeline;
@@ -187,10 +187,10 @@ public class IdentityPipelineTest {
 	@Test
 	public void testMultiThreadedHappyPath() {
 		CountDownLatch cdl = new CountDownLatch(10);
-		IdentityService is = new ThreadedIdentityService();
+		IdentityService is = new ThreadSafeIdentityService();
 		MalformedIdentityRepository malformed = malformedBatchRepository();
-		com.joshcummings.codeplay.concurrency.dependency.IdentityPipeline ip = 
-				new com.joshcummings.codeplay.concurrency.dependency.IdentityPipeline(
+		com.joshcummings.codeplay.concurrency.dependency.SingleThreadedIdentityPipeline ip = 
+				new com.joshcummings.codeplay.concurrency.dependency.SingleThreadedIdentityPipeline(
 			malformed, 
 			new ShortCircuitingMultiStrategyIdentityReader(Arrays.asList(
 				new CappedIdentityReader(10, cdl),

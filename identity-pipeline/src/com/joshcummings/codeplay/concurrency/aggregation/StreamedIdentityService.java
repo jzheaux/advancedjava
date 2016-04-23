@@ -69,6 +69,7 @@ public class StreamedIdentityService implements IdentityService {
 
 	// Notice the fact that we are submitting this inside a thread. The reason for this is to force
 	// Java to use our provided thread pool instead of ForkJoinPool.commonPool()
+	@Override
 	public Identity getOne(Predicate<Identity> p) {
 		try {
 			return es.submit(

@@ -1,10 +1,11 @@
 package com.joshcummings.codeplay.concurrency.dependency;
 
 import java.io.InputStream;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -21,9 +22,7 @@ import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.StatsLedger.StatsEntry;
 
-
-
-public class CompletableFutureIdentityPipeline {
+public class ContinuationPassingIdentityPipeline {
 	private MalformedIdentityRepository malformed; // fire and forget
 	private IdentityReader identityReader; 
 	private AddressVerifier addressVerifier;
@@ -31,8 +30,8 @@ public class CompletableFutureIdentityPipeline {
 	private EmailFormatter emailFormatter;
 	private IdentityService identityService;
 	private StatsLedger statsLedger;
-	
-	public CompletableFutureIdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
+		
+	public ContinuationPassingIdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
 			PhoneNumberFormatter phoneNumberFormatter, EmailFormatter emailFormatter, IdentityService identityService, StatsLedger statsLedger) {
 		this.malformed = malformed;
 		this.identityReader = identityReader;
@@ -42,41 +41,56 @@ public class CompletableFutureIdentityPipeline {
 		this.identityService = identityService;
 		this.statsLedger = statsLedger;
 	}
-
-	private ExecutorService pool = Executors.newWorkStealingPool();
-
-	public void process(InputStream input) {
-		StreamSupport.stream(
-	            new IdentityIterable(input, identityReader).spliterator(), true)
-			.forEach((identity) -> {
-				System.out.println("Processing identity #" + identity.getId());
-				try {
-					CompletableFuture<Void> address = CompletableFuture.runAsync(() ->
-						validateAddresses(identity),
-						pool);
-					
-					CompletableFuture<Void> phoneNumber = CompletableFuture.runAsync(() ->
-						phoneNumberFormatter.format(identity),
-						pool);
-						
-					CompletableFuture<Void> email = CompletableFuture.runAsync(() ->
-						emailFormatter.format(identity),
-						pool);
-		
-					CompletableFuture.allOf(address, phoneNumber, email)
-						.thenRunAsync(() -> {
-							if ( !identityService.persistOrUpdateBestMatch(identity) ) {
-								statsLedger.recordEntry(new StatsEntry(identity));
-							}
-						}, pool)
-						.exceptionally((ex) -> {
-							malformed.addIdentity(identity, ex.getMessage());
-							return null;
-						});
-				} catch ( Exception e ) {
-					malformed.addIdentity(identity, e.getMessage());
-				}
+	
+	private ExecutorService verifyPool = Executors.newWorkStealingPool();
+	private ExecutorService persistPool = Executors.newWorkStealingPool();
+	
+	public void process(InputStream input, Runnable processCompleted) {
+		read(input, processCompleted, (i) -> {
+			format(i, this::fail, (i2) -> {
+				persist(i2, this::fail, (i3) -> {
+					statsLedger.recordEntry(new StatsEntry(i3));
+				});
 			});
+		});
+	}
+	
+	private void read(InputStream input, Runnable end, Consumer<Identity> next) {
+		ForkJoinPool.commonPool().submit(() -> {
+			Identity identity = identityReader.read(input);
+ 		    if ( identity != null ) {
+				read(input, end, next);
+				System.out.println("Processing identity #" + identity.getId());
+				next.accept(identity);
+			} else {
+				end.run();
+			}
+		});
+	}
+	
+	private void format(Identity identity, BiConsumer<Identity, Throwable> failed, Consumer<Identity> identityFormatted) {
+		verifyPool.submit(() -> {
+			phoneNumberFormatter.format(identity);
+			emailFormatter.format(identity);
+			try {
+				validateAddresses(identity);
+				identityFormatted.accept(identity);
+			} catch ( NoValidAddressesException e ) {
+				failed.accept(identity, e);
+			}
+		});
+	}
+	
+	private void persist(Identity identity, BiConsumer<Identity, Throwable> failed, Consumer<Identity> identityPersisted) {
+		persistPool.submit(() -> {
+			if ( identityService.persistOrUpdateBestMatch(identity) ) {
+				identityPersisted.accept(identity);
+			}
+		});
+	}
+	
+	private void fail(Identity identity, Throwable t) {
+		malformed.addIdentity(identity, t.getMessage());
 	}
 	
 	private void validateAddresses(Identity identity) {

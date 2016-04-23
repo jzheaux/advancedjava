@@ -1,10 +1,10 @@
 package com.joshcummings.codeplay.concurrency.dependency;
 
 import java.io.InputStream;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -20,10 +20,12 @@ import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
 import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.StatsLedger.StatsEntry;
+import com.joshcummings.codeplay.concurrency.splitting.AsyncMultiStrategyIdentityReader;
 
 
 
-public class CompletableFutureIdentityPipeline {
+
+public class SingleThreadedIdentityPipeline {
 	private MalformedIdentityRepository malformed; // fire and forget
 	private IdentityReader identityReader; 
 	private AddressVerifier addressVerifier;
@@ -32,7 +34,9 @@ public class CompletableFutureIdentityPipeline {
 	private IdentityService identityService;
 	private StatsLedger statsLedger;
 	
-	public CompletableFutureIdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
+	private ExecutorService es = Executors.newWorkStealingPool();
+	
+	public SingleThreadedIdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
 			PhoneNumberFormatter phoneNumberFormatter, EmailFormatter emailFormatter, IdentityService identityService, StatsLedger statsLedger) {
 		this.malformed = malformed;
 		this.identityReader = identityReader;
@@ -42,44 +46,29 @@ public class CompletableFutureIdentityPipeline {
 		this.identityService = identityService;
 		this.statsLedger = statsLedger;
 	}
-
-	private ExecutorService pool = Executors.newWorkStealingPool();
-
+	
 	public void process(InputStream input) {
 		StreamSupport.stream(
 	            new IdentityIterable(input, identityReader).spliterator(), true)
-			.forEach((identity) -> {
-				System.out.println("Processing identity #" + identity.getId());
-				try {
-					CompletableFuture<Void> address = CompletableFuture.runAsync(() ->
-						validateAddresses(identity),
-						pool);
-					
-					CompletableFuture<Void> phoneNumber = CompletableFuture.runAsync(() ->
-						phoneNumberFormatter.format(identity),
-						pool);
-						
-					CompletableFuture<Void> email = CompletableFuture.runAsync(() ->
-						emailFormatter.format(identity),
-						pool);
-		
-					CompletableFuture.allOf(address, phoneNumber, email)
-						.thenRunAsync(() -> {
-							if ( !identityService.persistOrUpdateBestMatch(identity) ) {
-								statsLedger.recordEntry(new StatsEntry(identity));
-							}
-						}, pool)
-						.exceptionally((ex) -> {
-							malformed.addIdentity(identity, ex.getMessage());
-							return null;
-						});
-				} catch ( Exception e ) {
-					malformed.addIdentity(identity, e.getMessage());
+		//Stream.generate(() -> readIdentity(input)).parallel()
+		.forEach((identity) ->
+		{
+			System.out.println("Processing identity #" + identity.getId());
+			try {
+				validateAddresses(identity);
+				phoneNumberFormatter.format(identity);
+				emailFormatter.format(identity);
+	
+				if ( !identityService.persistOrUpdateBestMatch(identity) ) {
+					statsLedger.recordEntry(new StatsEntry(identity));
 				}
-			});
+			} catch ( Exception e ) {
+				malformed.addIdentity(identity, e.getMessage());
+			}
+		});
 	}
 	
-	private void validateAddresses(Identity identity) {
+	protected void validateAddresses(Identity identity) {
 		addressVerifier.verify(identity.getAddresses());
 		
 		if ( identity.getAddresses().stream().allMatch(a -> !a.isVerified())) {

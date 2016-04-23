@@ -1,21 +1,17 @@
 package com.joshcummings.codeplay.concurrency.splitting;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.joshcummings.codeplay.concurrency.BadIdentity;
-import com.joshcummings.codeplay.concurrency.Generator;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
 import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
-import com.joshcummings.codeplay.concurrency.Person;
+import com.joshcummings.codeplay.concurrency.RandomIdentityReader;
 
 public class MultiStrategyIdentityReaderTest {
 	private MalformedIdentityRepository malformed = new MalformedIdentityRepository() {
@@ -24,24 +20,6 @@ public class MultiStrategyIdentityReaderTest {
 
 		@Override
 		public void addIdentity(InputStream message, String reason) {}
-	};
-	
-	private static class RandomIdentityReader implements IdentityReader {
-		private int index;
-		
-		private RandomIdentityReader(int index) {
-			this.index = index;
-		}
-		@Override
-		public Identity read(InputStream is) {
-			try {
-				int i = is.read();
-				Generator.waitFor(i - 48 == index ? 100 : 1000);
-				return i - 48 == index ? new Person(null, null, null, null, null, Collections.emptyList(), null) : new BadIdentity();
-			} catch (IOException e) {
-				return new BadIdentity();
-			}
-		}
 	};
 
 	private List<IdentityReader> readers = Arrays.asList(

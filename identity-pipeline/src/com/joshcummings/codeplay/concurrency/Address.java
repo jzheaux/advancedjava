@@ -1,9 +1,10 @@
 package com.joshcummings.codeplay.concurrency;
 
 import java.util.Observable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Address extends Observable {
-	private static Integer ID_SOURCE = 0;
+	private static AtomicInteger ID_SOURCE = new AtomicInteger();
 	
 	private final Integer id;
 	private final String address1;
@@ -14,7 +15,7 @@ public class Address extends Observable {
 	private boolean verified;
 	
 	public Address(String address1, String city, String state, String zipCode) {
-		this.id = ++ID_SOURCE;
+		this.id = ID_SOURCE.incrementAndGet();
 		this.address1 = address1;
 		this.city = city;
 		this.state = state;
@@ -43,5 +44,8 @@ public class Address extends Observable {
 	}
 	public boolean isVerified() {
 		return verified;
+	}
+	public String toString() {
+		return "Address #" + id;
 	}
 }

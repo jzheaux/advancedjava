@@ -13,7 +13,12 @@ import com.joshcummings.codeplay.concurrency.single.CopyingInputStream;
 import com.joshcummings.codeplay.concurrency.splitting.ScatterGatherer.Gatherer;
 import com.joshcummings.codeplay.concurrency.splitting.ScatterGatherer.Scatterer;
 
-
+/**
+ * A supporting class that will fire off all back reading strategies at once and wait for something to come back.
+ * 
+ * @author Josh
+ *
+ */
 public class MultiStrategyIdentityReader implements IdentityReader {
 	protected final ScatterGatherer scatterGatherer;
 	protected final IdentityReader primary;
@@ -72,7 +77,7 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 
 		@Override
 		public Callable<Identity> next() {
-			//System.out.println(Thread.currentThread() + " says 'next' " + index);
+			System.out.println(Thread.currentThread() + " says 'next' " + index);
 			final int which = index++;
 			return () -> readers.get(which).read(cis.reread());
 		}
@@ -88,7 +93,7 @@ public class MultiStrategyIdentityReader implements IdentityReader {
 
 		@Override
 		public void gatherResult(Identity result) {
-			//System.out.println(Thread.currentThread() + " says 'gatherResult'");
+			System.out.println(Thread.currentThread() + " says 'gatherResult'");
 			this.result = result;
 		}
 

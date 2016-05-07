@@ -42,8 +42,8 @@ public class ThreadPoolExecutorMalformedIdentityRepository implements
 		 * to the underlying addIdentity into a lambda expression, which in this case is a syntactic
 		 * reduction of an anonymous implementation of the Runnable interface.
 		 */
-		//pool.submit(() -> delegate.addIdentity(identity, reason));
-		new Thread(() -> delegate.addIdentity(identity, reason)).start(); // <== SLOWER!!!
+		pool.submit(() -> delegate.addIdentity(identity, reason));
+		//new Thread(() -> delegate.addIdentity(identity, reason)).start(); // <== SLOWER!!!
 	}
 
 	@Override

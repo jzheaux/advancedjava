@@ -40,6 +40,8 @@ public class CountDownLatchIdentityPipeline {
 		this.statsLedger = statsLedger;
 	}
 
+	// putting operations of different natures into different thread pools allows them to grow differently
+	// and can reduce contention
 	private ExecutorService verifyPool = Executors.newWorkStealingPool();
 	private ExecutorService persistPool = Executors.newWorkStealingPool();
 	
@@ -64,11 +66,14 @@ public class CountDownLatchIdentityPipeline {
 
 				persistPool.submit(() -> {
 					try {
+						// this line will block and wait for the above three calls to finish
 						if ( cdl.await(3000, TimeUnit.MILLISECONDS) ) {
 							if (!identityService.persistOrUpdateBestMatch(identity)) {
 								statsLedger.recordEntry(new StatsEntry(identity));
 							}
 						} else {
+							// we can read an error message here that is supplied by the verification, 
+							// but it's been left out for simplicity
 							malformed.addIdentity(identity, "Something went wrong with validation");
 						}
 					} catch (InterruptedException e) {

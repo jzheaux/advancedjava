@@ -44,7 +44,7 @@ public class ProducerMalformedIdentityRepository implements
 		protected void compute() {
 			try {
 				Runnable r = todo.take();
-				new Consumer().fork();
+				new Consumer().fork(); // concurrent recursive invocation
 				r.run();
 			} catch ( InterruptedException e ) {
 				Thread.currentThread().interrupt();

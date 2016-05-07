@@ -2,94 +2,93 @@ package com.joshcummings.codeplay.concurrency.throttle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Queue;
-import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.stream.StreamSupport;
+import java.util.stream.Collectors;
 
 import com.joshcummings.codeplay.concurrency.Address;
 import com.joshcummings.codeplay.concurrency.AddressVerifier;
 
 public class BatchingAddressVerifier implements AddressVerifier {
-	private Queue<Address> toBeVerified = new ConcurrentLinkedQueue<>();
+	private BlockingQueue<BatchOperation> jobQueue = new LinkedBlockingQueue<>();
 	
 	private final AddressVerifier delegate;
 	
 	private final CyclicBarrier batcher;
 
 	private final int batchSize;
-	private final int perVerifyWaitTime;
+	private final int timeout;
 	
-	private final ExecutorService es = Executors.newCachedThreadPool();
+	private final ExecutorService fetcher = Executors.newFixedThreadPool(500);
+	private final ExecutorService sender = Executors.newFixedThreadPool(500);
+	private final ExecutorService latch = Executors.newFixedThreadPool(500);
 	
-	public BatchingAddressVerifier(AddressVerifier delegate, int batchSize, int perVerifyWaitTime) {
+	public BatchingAddressVerifier(AddressVerifier delegate, int batchSize, int timeout) {
 		this.delegate = delegate;
 		this.batchSize = batchSize;
-		this.perVerifyWaitTime = perVerifyWaitTime;
+		this.timeout = timeout;
 		batcher = new CyclicBarrier(batchSize);
 	}
 	
-	private List<Address> pollTen() {
-		List<Address> batch = new ArrayList<>(batchSize);
-		int count = 0;
-		while ( count < batchSize ) {
-			batch.add(toBeVerified.poll());
-			count++;
-		}
-		return batch;
-	}
-	
-	private void sendBatch() {
-		delegate.verify(pollTen());
+	private void fetchThenSendBatch() {
+		List<BatchOperation> batch = new ArrayList<>(batchSize);
+		jobQueue.drainTo(batch, batchSize);
+		
+		sender.submit(() -> {
+			List<Address> addresses = batch.stream().map(p -> p.a).collect(Collectors.toList());
+			delegate.verify(addresses);
+			batch.stream().forEach(p -> p.c.countDown());
+		});
 	}
 	
 	@Override
 	public void verify(List<Address> addresses) {
-		Queue<Address> overflow = new ConcurrentLinkedQueue<>(addresses);
 		CountDownLatch cdl = new CountDownLatch(addresses.size());
-		addresses.stream().map(address ->
-			new Address(address.getAddress1(), address.getCity(), address.getState(), address.getZipCode()) {
-				public void setVerified(boolean verified) {
-					address.setVerified(verified);
-					overflow.remove(address);
-					cdl.countDown();
-				}
-			})
+		
+		addresses.stream()
 			.forEach(address -> {
-				toBeVerified.add(address);
-				es.submit(() -> {
+				jobQueue.offer(new BatchOperation(address, cdl));
+				fetcher.submit(() -> {
 					try {
-						if ( batcher.await(perVerifyWaitTime, TimeUnit.MILLISECONDS) == 0 ) {
-							sendBatch();
+						if ( batcher.await(timeout, TimeUnit.MILLISECONDS) == 0 ) {
+							fetchThenSendBatch();
 						}
 					}
 					catch (TimeoutException | BrokenBarrierException | InterruptedException e) {
-						cdl.countDown();
+						fetchThenSendBatch();
 					}
 				});
-			
 			});
 		
-		try {
-			cdl.await(perVerifyWaitTime*overflow.size(), TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		latch.submit(() -> {
+			try {
+				cdl.await();
+			} catch ( InterruptedException e ) {
+				Thread.currentThread().interrupt();
+			}
+		});
+	}
+	
+	public void close() {
+		fetcher.shutdownNow();
+		sender.shutdownNow();
+		latch.shutdownNow();
+	}
+	
+	private static class BatchOperation {
+		public final Address a;
+		public final CountDownLatch c;
 		
-		if ( !overflow.isEmpty() ) {
-			System.out.println("Processing an overflow of size: " + overflow.size());
-			delegate.verify(new ArrayList<>(overflow));
+		public BatchOperation(Address a, CountDownLatch c) {
+			this.a = a;
+			this.c = c;
 		}
 	}
 	

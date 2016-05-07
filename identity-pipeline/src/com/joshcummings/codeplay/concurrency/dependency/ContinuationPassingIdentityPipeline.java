@@ -6,14 +6,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.joshcummings.codeplay.concurrency.AddressVerifier;
-import com.joshcummings.codeplay.concurrency.BadIdentity;
 import com.joshcummings.codeplay.concurrency.EmailFormatter;
 import com.joshcummings.codeplay.concurrency.Identity;
-import com.joshcummings.codeplay.concurrency.IdentityIterable;
 import com.joshcummings.codeplay.concurrency.IdentityReader;
 import com.joshcummings.codeplay.concurrency.IdentityService;
 import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;

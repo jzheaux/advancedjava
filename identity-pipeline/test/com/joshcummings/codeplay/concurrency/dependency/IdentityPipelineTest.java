@@ -30,7 +30,6 @@ import com.joshcummings.codeplay.concurrency.SimplePhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.aggregation.ThreadSafeIdentityService;
 import com.joshcummings.codeplay.concurrency.aggregation.ThreadSafeStatsLedger;
-import com.joshcummings.codeplay.concurrency.single.IdentityPipeline;
 import com.joshcummings.codeplay.concurrency.splitting.MultiStrategyIdentityReader;
 import com.joshcummings.codeplay.concurrency.splitting.SingleThreadedScatterGatherer;
 

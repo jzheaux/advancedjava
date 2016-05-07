@@ -12,31 +12,26 @@ public class BadIdentity implements Identity {
 	
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public char[] getPassword() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getPhoneNumber() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getEmailAddress() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -46,16 +41,11 @@ public class BadIdentity implements Identity {
 
 	@Override
 	public List<Address> getAddresses() {
-		// TODO Auto-generated method stub
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	@Override
 	public ReentrantLock getLock() {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
-	
-
 }

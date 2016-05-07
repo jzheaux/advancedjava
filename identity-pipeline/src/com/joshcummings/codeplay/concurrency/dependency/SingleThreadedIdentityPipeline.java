@@ -1,15 +1,9 @@
 package com.joshcummings.codeplay.concurrency.dependency;
 
 import java.io.InputStream;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.joshcummings.codeplay.concurrency.AddressVerifier;
-import com.joshcummings.codeplay.concurrency.BadIdentity;
 import com.joshcummings.codeplay.concurrency.EmailFormatter;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityIterable;
@@ -20,10 +14,6 @@ import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
 import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.StatsLedger.StatsEntry;
-import com.joshcummings.codeplay.concurrency.splitting.AsyncMultiStrategyIdentityReader;
-
-
-
 
 public class SingleThreadedIdentityPipeline {
 	private MalformedIdentityRepository malformed; // fire and forget
@@ -33,8 +23,6 @@ public class SingleThreadedIdentityPipeline {
 	private EmailFormatter emailFormatter;
 	private IdentityService identityService;
 	private StatsLedger statsLedger;
-	
-	private ExecutorService es = Executors.newWorkStealingPool();
 	
 	public SingleThreadedIdentityPipeline(MalformedIdentityRepository malformed, IdentityReader identityReader, AddressVerifier addressVerifier,
 			PhoneNumberFormatter phoneNumberFormatter, EmailFormatter emailFormatter, IdentityService identityService, StatsLedger statsLedger) {
@@ -50,7 +38,6 @@ public class SingleThreadedIdentityPipeline {
 	public void process(InputStream input) {
 		StreamSupport.stream(
 	            new IdentityIterable(input, identityReader).spliterator(), true)
-		//Stream.generate(() -> readIdentity(input)).parallel()
 		.forEach((identity) ->
 		{
 			System.out.println("Processing identity #" + identity.getId());

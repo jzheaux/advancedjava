@@ -38,6 +38,7 @@ public class ProducerMalformedIdentityRepository implements
 	// =================== Consumer Starts Here =========================
 	
 	private class Consumer extends RecursiveAction {
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected void compute() {

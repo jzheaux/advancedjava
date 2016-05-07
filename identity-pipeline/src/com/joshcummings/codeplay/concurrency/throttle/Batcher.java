@@ -1,7 +1,6 @@
 package com.joshcummings.codeplay.concurrency.throttle;
 
 import java.util.List;
-import java.util.Observable;
 import java.util.concurrent.Future;
 
 import com.joshcummings.codeplay.concurrency.Address;

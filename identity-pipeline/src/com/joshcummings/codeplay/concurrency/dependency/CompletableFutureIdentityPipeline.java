@@ -2,14 +2,11 @@ package com.joshcummings.codeplay.concurrency.dependency;
 
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.joshcummings.codeplay.concurrency.AddressVerifier;
-import com.joshcummings.codeplay.concurrency.BadIdentity;
 import com.joshcummings.codeplay.concurrency.EmailFormatter;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityIterable;

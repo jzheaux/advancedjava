@@ -8,6 +8,11 @@ import java.util.function.Supplier;
 
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 
+/**
+ * A stats ledger that naively wraps the recordEntry call in a ReentrantLock, effectively 
+ * synchronizing access to the method.
+ *
+ */
 public class LockableStatsLedger implements StatsLedger {
 	private volatile StatsLedger delegate;
 

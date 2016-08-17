@@ -17,8 +17,6 @@ import com.joshcummings.codeplay.concurrency.NoValidAddressesException;
  * This demonstrates how ThreadPoolExecutor can be used to apply backpressure on top of
  * limiting the number of threads available at a time to the process.
  * 
- * @author Josh
- *
  */
 public class BackpressureAddressVerifier implements AddressVerifier {
 

@@ -5,6 +5,12 @@ import java.util.Map;
 
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 
+/**
+ * A thread unsafe stats ledger.
+ * 
+ * @author Josh
+ *
+ */
 public class SimpleStatsLedger implements StatsLedger {
 	private Map<String, Integer> firstNameMap = new HashMap<>();
 	private Map<String, Integer> lastNameMap = new HashMap<>();

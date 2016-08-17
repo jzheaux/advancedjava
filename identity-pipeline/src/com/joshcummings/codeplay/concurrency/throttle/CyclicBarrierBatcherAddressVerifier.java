@@ -6,6 +6,10 @@ import java.util.concurrent.ExecutionException;
 import com.joshcummings.codeplay.concurrency.Address;
 import com.joshcummings.codeplay.concurrency.AddressVerifier;
 
+/**
+ * An example of implementing asynchronous batching using CyclicBarrier. {@see CyclicBarrierBatcher} for more detail.
+ * 
+ */
 public class CyclicBarrierBatcherAddressVerifier implements AddressVerifier {
 	private CyclicBarrierBatcher batcher;
 	

@@ -6,6 +6,10 @@ import java.util.concurrent.atomic.LongAdder;
 
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 
+/**
+ * A thread-safe stats ledger that exercises ConcurrentHashMap and LongAdder.
+ * 
+ */
 public class ThreadSafeStatsLedger implements StatsLedger {
 	private Map<String, LongAdder> firstNameMap = new ConcurrentHashMap<>();
 	private Map<String, LongAdder> lastNameMap = new ConcurrentHashMap<>();

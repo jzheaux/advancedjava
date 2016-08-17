@@ -5,8 +5,6 @@ import com.joshcummings.codeplay.concurrency.Identity;
 /**
  * An example of the scatter-gather pattern when done in a single thread
  * 
- * @author Josh
- *
  */
 public class SingleThreadedScatterGatherer implements ScatterGatherer {
 	@Override

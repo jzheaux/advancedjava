@@ -19,7 +19,10 @@ import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.StatsLedger.StatsEntry;
 
 
-
+/**
+ * An identity pipeline that coordinates asynchronous dependencies using CompletableFuture.
+ * 
+ */
 public class CompletableFutureIdentityPipeline {
 	private MalformedIdentityRepository malformed; // fire and forget
 	private IdentityReader identityReader; 

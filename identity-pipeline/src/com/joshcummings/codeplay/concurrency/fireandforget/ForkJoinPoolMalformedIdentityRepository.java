@@ -7,6 +7,10 @@ import java.util.concurrent.Executors;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 
+/**
+ * An implementation of fire-and-forget that naively submits the underlying task to a ForkJoinPool.
+ * 
+ */
 public class ForkJoinPoolMalformedIdentityRepository implements
 		MalformedIdentityRepository {
 	// To get a work-stealing thread pool is as simple as calling a different static

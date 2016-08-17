@@ -15,6 +15,11 @@ import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.IdentityService;
 import com.joshcummings.codeplay.concurrency.Person;
 
+/**
+ * A thread-safe identity service that using ReentrantLock on each element instead of on the entire method.
+ * 
+ *
+ */
 public class ThreadSafeIdentityService implements IdentityService {
 	private volatile Queue<Identity> verifiedIdentities = new ConcurrentLinkedQueue<>();
 

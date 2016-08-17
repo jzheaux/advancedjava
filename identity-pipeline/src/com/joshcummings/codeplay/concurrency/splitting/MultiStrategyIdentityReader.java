@@ -15,8 +15,6 @@ import com.joshcummings.codeplay.concurrency.splitting.ScatterGatherer.Scatterer
 
 /**
  * A supporting class that will fire off all back reading strategies at once and wait for something to come back.
- * 
- * @author Josh
  *
  */
 public class MultiStrategyIdentityReader implements IdentityReader {

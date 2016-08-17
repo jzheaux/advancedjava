@@ -4,6 +4,10 @@ import java.util.concurrent.Callable;
 
 import com.joshcummings.codeplay.concurrency.Identity;
 
+/**
+ * A scatter-gather contract.
+ * 
+ */
 public interface ScatterGatherer {
 	public Identity go(Scatterer s, Gatherer g);
 	

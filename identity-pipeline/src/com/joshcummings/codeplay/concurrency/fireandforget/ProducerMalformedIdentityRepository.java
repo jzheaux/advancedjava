@@ -9,6 +9,10 @@ import java.util.concurrent.RecursiveAction;
 import com.joshcummings.codeplay.concurrency.Identity;
 import com.joshcummings.codeplay.concurrency.MalformedIdentityRepository;
 
+/**
+ * An implementation of fire-and-forget that manages its own pool of tasks and consumers.
+ * 
+ */
 public class ProducerMalformedIdentityRepository implements
 		MalformedIdentityRepository {
 	private MalformedIdentityRepository delegate;

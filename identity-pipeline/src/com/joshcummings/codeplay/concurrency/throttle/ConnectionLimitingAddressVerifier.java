@@ -12,8 +12,6 @@ import com.joshcummings.codeplay.concurrency.AddressVerifier;
  * This class demonstrates 1) how one can limit connections to an underlying method invocation
  * and 2) how one can increase and decrease the limit at runtime.
  * 
- * @author Josh
- *
  */
 public class ConnectionLimitingAddressVerifier implements AddressVerifier {
 	private ConfigurableSemaphore limiter;

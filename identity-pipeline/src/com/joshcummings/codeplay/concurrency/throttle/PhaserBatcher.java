@@ -24,8 +24,6 @@ import com.joshcummings.codeplay.concurrency.AddressVerifier;
  * 
  * For simplicity in the demo, this class assumes usage of the AddressVerifier, however,
  * it has been written in such a way as to make it generalizable.
- * 
- * @author Josh
  *
  */
 public class PhaserBatcher implements Batcher {

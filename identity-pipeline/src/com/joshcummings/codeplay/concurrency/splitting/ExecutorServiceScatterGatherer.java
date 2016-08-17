@@ -8,6 +8,10 @@ import java.util.concurrent.Future;
 
 import com.joshcummings.codeplay.concurrency.Identity;
 
+/**
+ * An example of the scatter-gather pattern as implemented using a basic ExecutorService.
+ * 
+ */
 public class ExecutorServiceScatterGatherer implements ScatterGatherer {	
 	private final ExecutorService pool = Executors.newCachedThreadPool();
 

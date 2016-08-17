@@ -15,6 +15,11 @@ import com.joshcummings.codeplay.concurrency.PhoneNumberFormatter;
 import com.joshcummings.codeplay.concurrency.StatsLedger;
 import com.joshcummings.codeplay.concurrency.StatsLedger.StatsEntry;
 
+
+/**
+ * A single-threaded identity pipeline.
+ * 
+ */
 public class SingleThreadedIdentityPipeline {
 	private MalformedIdentityRepository malformed; // fire and forget
 	private IdentityReader identityReader; 

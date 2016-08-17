@@ -12,8 +12,6 @@ import com.joshcummings.codeplay.concurrency.Identity;
  * 
  * This class will loop through given options, firing each onto a separate thread. It will then block and wait until
  * the fastest one completes.
- * 
- * @author Josh
  *
  */
 public class ExecutorCompletionServiceScatterGatherer implements ScatterGatherer {
